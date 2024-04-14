@@ -1,4 +1,4 @@
-import {set,onValue,ref} from 'firebase/database'
+import {set,onValue,ref,get} from 'firebase/database'
 import {signInAnonymously} from 'firebase/auth'
 import {database,auth} from 'firebaseConfig/firebase'
 import React, {  useState,useEffect } from 'react';
@@ -8,24 +8,27 @@ import {useNavigate} from 'react-router-dom'
 
 
 const StartPage = () =>{
+
     const [username,setUsername]=useState("")
     const [user, loading, error] = useAuthState(auth);
     const navigate = useNavigate()
-    if(user){
-        navigate('/chat')
-    }
     
+    if(loading){
+        return <h1 style={{color:"red"}}>WHOAHOHLUISHEFIUHSELIUFHSLI</h1>
+    }
+
+
     const signIn = async()=>{
         try{
-            await signInAnonymously(auth)
+            await signInAnonymously(auth)  
         }
         catch(err){
             alert(err.message)
         }
+        
     }
     
     const addUserToDatabase = async()=>{
-
         const userDocumentRef = ref(database,`Users/${user.uid}`)
         const currentDate = new Date()
         try{
@@ -34,16 +37,33 @@ const StartPage = () =>{
                 dateCreated:currentDate.getTime()
             })
             navigate('/chat')
-
         }
         catch(err){ 
             alert(err.message)
         }
 
     }
-    if(user){
-        addUserToDatabase()
+    const checkDocumentExists = async(id)=>{
+        try{
+            const documentRef = ref(database, `Users/${id}`)
+            const snapshot = await get(documentRef)
+            if(snapshot.exists()){
+                navigate('/chat')
+            }
+            else{
+                addUserToDatabase()
+            }
+        }
+        catch(err){
+            addUserToDatabase()
+        }
+        
     }
+    if(user){
+        checkDocumentExists(user.uid)
+    }
+    
+    
     
     const generateRandomKey=(length)=> {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

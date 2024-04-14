@@ -8,17 +8,16 @@ import React, {  useState,useEffect } from 'react';
 const HomePage = ()=>{
     const navigate = useNavigate()
     const [user, loadingUser, errorUser] = useAuthState(auth);
+    const [snapshot, loadingSnapshot, snapshotError] = useObject(user?ref(database,`Users/${user.uid}`):null)
     const [signOut,loadingLogout,logoutError] = useSignOut(auth)
-    const [snapshot, loadingSnapshot, snapshotError] = useObject(ref(database,`Users/${user.uid}`))
     const [username,setUsername] = useState("")
     
 
     /* manage user info retrieval */
 
-    if(!user){
-        navigate('/')
-    }
-
+    // if(!user){
+    //     navigate('/')
+    // }
 
     /* manage logout */
 
@@ -26,28 +25,28 @@ const HomePage = ()=>{
         alert(logoutError.message)
     }
     
-
-    /* manage getting username from database  */
-    if(snapshotError){
-        alert(snapshotError.message)
-    }    
     useEffect(()=>{
-        if(snapshot){
+        if(snapshot&&user){
             /* snapshot.val() = {"dateCreated":1713094084929,"username":"yian"} */
-            setUsername(snapshot.val().username)
+            // console.log(snapshot.val().username)
+            // setUsername(snapshot.val().username)
         }
     },[snapshot])
 
     return <div>
         {(loadingLogout||loadingSnapshot||loadingUser)&&<p>loading…</p>}
-        {(errorUser||snapshotError)&&<p>Looks like something went wrong. Try refreshing the page.</p>}
+        {(errorUser||snapshotError)&&<p>
+            Looks like something went wrong. Try refreshing the page.</p>}
+        {(snapshot&&user)&&
         <div>
-            <p>welcome, {username}</p>
+            <p>welcome, {JSON.stringify(snapshot.val())}</p>
+            <p>welcome, {JSON.stringify(user.uid)}</p>
+            {/* <p>welcome, {JSON.stringify(snapshot.val().username)}</p> */}
             <button onClick={async()=>{
                 await signOut();
                 navigate('/')
             }}>sign out</button>
-        </div>
+        </div>}
     </div>
 }
 export default HomePage
