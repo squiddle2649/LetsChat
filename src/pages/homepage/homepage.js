@@ -50,6 +50,7 @@ const HomePage = ()=>{
         }
     }
     const exitQueue = async()=>{
+        if(!user)return
         const userInQueueRef = ref(database,`Queue/${user.uid}`)
         try{
             await remove(userInQueueRef)
@@ -65,18 +66,6 @@ const HomePage = ()=>{
         alert(`An error occured: ${snapshotErrorQ.message}`)
     }
 
-    const addToConversation = async(friendID)=>{
-        const conversationRef = ref(database,`Users/${user.uid}/CurrentConversation`)
-        try{
-            await set(conversationRef,{
-                friend:friendID
-            })
-        }
-        catch(err){
-            alert(err.message)
-        }
-    }
-
     useEffect(()=>{
         if(!inQueue){
             exitQueue()
@@ -84,14 +73,25 @@ const HomePage = ()=>{
         } 
             
         const unsubscribe = onValue(queueCollection,(snapshotQ)=>{
-        snapshotQ.forEach(async(document)=>{
-            const documentID = document.key;
-            if(documentID!==user.uid){
-                exitQueue()
-                addToConversation(documentID)
-                navigate(`/chat/${documentID}`)
-            }
-        })
+            
+            const queuePeople = snapshotQ.val()
+            const queuePeopleIDs = Object.keys(queuePeople)
+            queuePeopleIDs.forEach(async(friendID)=>{
+                if(friendID!==user.uid){
+                    await addToConversation(friendID)
+                    return
+                }
+            })
+        // snapshotQ.forEach(async(document)=>{
+            // const documentID = document.key;
+            
+            // if(documentID!==user.uid){
+            //     exitQueue()
+            //     addToConversation(documentID)
+            //     navigate(`/chat/${documentID}`)
+                
+            // }
+        // })
         })
             
         return()=>{
@@ -99,6 +99,22 @@ const HomePage = ()=>{
         }
     },[inQueue])
     
+    const addToConversation = async(friendID)=>{
+        const conversationRef = ref(database,`Users/${user.uid}/CurrentConversation`)
+        try{
+            await exitQueue()
+            await set(conversationRef,{
+                friend:friendID
+            })
+            navigate(`/chat/${friendID}`)
+        }
+        catch(err){
+            alert(err.message)
+        }
+        finally{
+            await exitQueue()
+        }
+    }
 
     useEffect(()=>{
         if(!user)return

@@ -1,6 +1,6 @@
 import { useParams,Link } from "react-router-dom"
 import { database,auth } from "firebaseConfig/firebase"
-import { ref,set } from "firebase/database"
+import { ref,set,onDisconnect,remove } from "firebase/database"
 import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect } from 'react';
@@ -21,6 +21,15 @@ const Chatroom = ()=>{
         setIDisRight(snapshot.val()===friendID)
     },[user,snapshot])
 
+    useEffect(()=>{
+        if(!user)return
+        const userInQueueRef = ref(database,`Users/${user.uid}/CurrentConversation`)
+        onDisconnect(userInQueueRef).remove()
+
+        return ()=>{
+            console.log('cleaning up')
+        }
+    }, []);
 
     return <div>
         {(loadingUser||loadingSnapshot)&&<p>loading…</p>}
