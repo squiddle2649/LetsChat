@@ -24,7 +24,8 @@ const StartPage = () =>{
             await signInAnonymously(auth)  
         }
         catch(err){
-            alert(err.message)
+            alert(`An error occured while signing in: ${err.message}`)
+
         }
         
     }
@@ -40,7 +41,8 @@ const StartPage = () =>{
             navigate('/chat')
         }
         catch(err){ 
-            alert(err.message)
+            alert(`An error occured: ${err.message}`)
+
         }
 
     }

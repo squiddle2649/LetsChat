@@ -9,20 +9,20 @@ const HomePage = ()=>{
     const navigate = useNavigate()
     const [user, loadingUser, errorUser] = useAuthState(auth);
     const [snapshot, loadingSnapshot, snapshotError] = useObject(user?ref(database,`Users/${user.uid}`):null)
+    // const [snapshotQ, loadingSnapshotQ, snapshotErrorQ] = useObject(user?ref(database,`Queue/${user.uid}`):null)
     
     const [signOut,loadingLogout,logoutError] = useSignOut(auth)
     const [username,setUsername] = useState("")
     const [peopleInQueue, setPeopleInQueue] = useState([])
     const [inQueue, setInQueue] = useState(false)
-    const [match,setMatch]=useState(null)
-    const [isUserOnline, setIsUserOnline] = useState(null);
+    
 
     const queueCollection = ref(database,"Queue")
 
     /* manage logout */
 
     if(logoutError){
-        alert(logoutError.message)
+        alert(`An error occured while loggin out: ${logoutError.message}`)
     }
     
     useEffect(()=>{
@@ -34,6 +34,7 @@ const HomePage = ()=>{
     },[snapshot])
 
     const enterQueue = async()=>{
+        if(!user)return
         const userInQueueRef = ref(database,`Queue/${user.uid}`)
         try{    
             await set(userInQueueRef,{
@@ -41,9 +42,10 @@ const HomePage = ()=>{
             })
             setInQueue(true)
             
+            
         }
         catch(err){
-            alert(err.message)
+            alert(`An error occured while entering the queue: ${err.message}`)
         }
     }
     const exitQueue = async()=>{
@@ -53,39 +55,40 @@ const HomePage = ()=>{
             setInQueue(false)
         }
         catch(err){
-            alert(err.message)
+            alert(`An error occured while exiting the queue: ${err.message}`)
+
         }
-
     }
+    const [snapshotQ, loadingSnapshotQ, snapshotErrorQ] = useObject(queueCollection)
+    useEffect(()=>{
+        if(!inQueue)return
+        const unsubscribe = onValue(queueCollection,(snapshotQ)=>{
+            snapshotQ.forEach((document)=>{
+                const documentID = document.key;
+                setPeopleInQueue([...peopleInQueue,documentID])
+                console.log(`here: ${documentID}`)
 
-    /* useEffect(async()=>{
-        if(!user)return
-        const presenceRef = ref(database, '.info/connected');
-        const userStatusRef = ref(database, `Status/${user.uid}`);
-        const unsubscribe = onValue(presenceRef, (snapshot) => {
-            if (snapshot.exists() && snapshot.val() === true) {
-              // User is online
-              setIsUserOnline(true);
-              
-              // Set user's presence to online when connected
-               set(userStatusRef,{ online: true });
-              
-              // Set user's presence to offline when disconnected
+            })
+            // console.log("something happened?")
+        })
             
-            onDisconnect(userStatusRef).set({online:false})
-              
-            } else {
-              // User is offline
-              setIsUserOnline(false);
-            }
-          });
+        return()=>{
+            unsubscribe()
+        }
+    },[inQueue])
+    
 
-          // Clean up on unmount
-    return () => {
-        // Reset user's presence to offline
-        onDisconnect(userStatusRef).set({online:false})
-      };
-    }, []); */
+    useEffect(()=>{
+        if(!user)return
+        const userInQueueRef = ref(database,`Queue/${user.uid}`)
+        onDisconnect(userInQueueRef).remove()
+        //removing the user from queue if he disconects.
+        return ()=>{
+            console.log('cleaning up')
+        }
+    }, []);
+
+    
     
     // useEffect(()=>{
     //     if(!user||!inQueue)return
@@ -124,6 +127,7 @@ const HomePage = ()=>{
             :<button onClick={enterQueue}>start chatting</button>}
             
             <button onClick={async()=>{
+                await exitQueue()
                 await signOut();
                 navigate('/')
             }}>sign out</button>
