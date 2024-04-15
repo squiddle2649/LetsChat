@@ -14,6 +14,7 @@ const HomePage = ()=>{
     const [signOut,loadingLogout,logoutError] = useSignOut(auth)
     const [username,setUsername] = useState("")
     const [peopleInQueue, setPeopleInQueue] = useState([])
+    const [match,setMatch]=useState(null)
     const [inQueue, setInQueue] = useState(false)
     
 
@@ -60,16 +61,37 @@ const HomePage = ()=>{
         }
     }
     const [snapshotQ, loadingSnapshotQ, snapshotErrorQ] = useObject(queueCollection)
-    useEffect(()=>{
-        if(!inQueue)return
-        const unsubscribe = onValue(queueCollection,(snapshotQ)=>{
-            snapshotQ.forEach((document)=>{
-                const documentID = document.key;
-                setPeopleInQueue([...peopleInQueue,documentID])
-                console.log(`here: ${documentID}`)
+    if(snapshotErrorQ){
+        alert(`An error occured: ${snapshotErrorQ.message}`)
+    }
 
+    const addToConversation = async(friendID)=>{
+        const conversationRef = ref(database,`Users/${user.uid}/CurrentConversation`)
+        try{
+            await set(conversationRef,{
+                friend:friendID
             })
-            // console.log("something happened?")
+        }
+        catch(err){
+            alert(err.message)
+        }
+    }
+
+    useEffect(()=>{
+        if(!inQueue){
+            exitQueue()
+            return
+        } 
+            
+        const unsubscribe = onValue(queueCollection,(snapshotQ)=>{
+        snapshotQ.forEach(async(document)=>{
+            const documentID = document.key;
+            if(documentID!==user.uid){
+                exitQueue()
+                addToConversation(documentID)
+                navigate(`/chat/${documentID}`)
+            }
+        })
         })
             
         return()=>{
@@ -82,35 +104,11 @@ const HomePage = ()=>{
         if(!user)return
         const userInQueueRef = ref(database,`Queue/${user.uid}`)
         onDisconnect(userInQueueRef).remove()
-        //removing the user from queue if he disconects.
+
         return ()=>{
             console.log('cleaning up')
         }
     }, []);
-
-    
-    
-    // useEffect(()=>{
-    //     if(!user||!inQueue)return
-    //     const unsubscribe=onValue(queueCollection,(snapshot)=>{
-    //         const ids = Object.keys(snapshot.val())
-    //         setPeopleInQueue(ids)
-
-    //         /* we are now going to filter this ids array so that it doesn't include the
-    //         user's own id */
-            
-    //         const filteredIDs = ids.filter(item => item!==user.uid)
-    //         console.log(filteredIDs)
-    //         console.log(`in queue = ${inQueue}`)
-    //         if(filteredIDs[0]){
-    //             setMatch(filteredIDs[0])
-    //             navigate(`/chat/${filteredIDs[0]}`)
-    //         }
-
-
-    //     })
-    //     return ()=>unsubscribe()
-    // },[inQueue])
 
 
     return <div>
@@ -132,9 +130,10 @@ const HomePage = ()=>{
                 navigate('/')
             }}>sign out</button>
         </div>}
+
+        {(inQueue)&&<p>finding someone…</p>}
         
-        
-        
+        <button onClick={()=>{ addToConversation("random user")}}>add to convos</button>
     </div>
 }
 export default HomePage
