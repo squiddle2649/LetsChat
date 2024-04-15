@@ -8,18 +8,24 @@ const Chatroom = ()=>{
     const {friendID} = useParams()
     const [IDisRight, setIDisRight] = useState(true)
     const[user,loadingUser,userError] = useAuthState(auth)
+    const [messages,setMessages] = useState([])
     const conversationPartnerRef = 
         user?ref( database,`Users/${user.uid}/CurrentConversation/friend`):null
         /* here we are getting data from the conversation partner of the user to 
         make sure that he is the same as the friendID from the URL. If it isn't,
         the we will have to throw an error. */
 
-    const [snapshot,loadingSnapshot,snapshotError] = useObject(conversationPartnerRef)
+    const [friendSnapshot,loadingSnapshotFriend,friendSnapshotError] = 
+    useObject(conversationPartnerRef)
+
+    const [messageSnapshot,loadingSnapshotMessage,messageSnapshotError] = 
+    useObject(conversationPartnerRef)
+    
 
     useEffect(()=>{
-        if(!user||!snapshot)return
-        setIDisRight(snapshot.val()===friendID)
-    },[user,snapshot])
+        if(!user||!friendSnapshot)return
+        setIDisRight(friendSnapshot.val()===friendID)
+    },[user,friendSnapshot])
 
     useEffect(()=>{
         if(!user)return
@@ -31,16 +37,41 @@ const Chatroom = ()=>{
         }
     }, []);
 
+    useEffect(()=>{
+        const messagesRef = ref(database, `Users/${friendID}/CurrentConversations`)
+        const unsubscribe = onValue(messagesRef,(messageSnapshot)=>{
+            
+        })
+        return()=>{
+            unsubscribe()
+        }
+        
+
+    },[])
+
     return <div>
-        {(loadingUser||loadingSnapshot)&&<p>loading…</p>}
-        {(snapshotError||userError||!IDisRight)&& 
+        {(loadingUser||loadingSnapshotFriend)&&<p>loading…</p>}
+        {(friendSnapshotError||userError||!IDisRight)&& 
             <section>
                 <p>looks like something went wrong.</p>
                 <Link to="/chat">Go back home</Link> 
             </section>}
-        {/* {snapshot&& <div>you are speaking to {JSON.stringify(friendName)}</div> }
-        {(userError)&&<p>Something went wrong…</p>} */}
-        <p>welcome to chat room</p>
+        
+        {(user&&friendSnapshot)&&
+        <div>
+            <p>welcome to chat room</p>
+            <ul>
+                {messages.map((message)=>(
+                    sender===user.uid?
+                    <li>message.text</li>:
+                    <li style={{color:'red'}}>message.text</li>
+                ))}
+            </ul>
+        </div>
+        
+        
+        }
+
     </div>
 }
 export default Chatroom

@@ -73,7 +73,7 @@ const HomePage = ()=>{
         } 
             
         const unsubscribe = onValue(queueCollection,(snapshotQ)=>{
-            
+            if(!snapshotQ.exists())return
             const queuePeople = snapshotQ.val()
             const queuePeopleIDs = Object.keys(queuePeople)
             queuePeopleIDs.forEach(async(friendID)=>{
