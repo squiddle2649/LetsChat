@@ -10,7 +10,9 @@ const Chatroom = ()=>{
     const [user,loadingUser,userError] = useAuthState(auth)
     const [messages,setMessages] = useState([])
     const [currentMessage, setCurrentMessage] = useState("")
-
+    // const [existentIDs, setExistentIDs] = useState([])
+    const existentIDs = new Set();
+    const [effectCounter, setEffectCounter] = useState(0)
     const conversationPartnerRef = 
         user?ref( database,`Users/${user.uid}/CurrentConversation/friend`):null
         /* here we are getting data from the conversation partner of the user to 
@@ -29,17 +31,18 @@ const Chatroom = ()=>{
         //verifying that the ID in the URL really is the friend's ID.
     },[user,friendSnapshot])
 
-    // useEffect(()=>{
-    //     if(!user)return
-    //     onDisconnect(currentConversation).remove()
-        
-    //     return ()=>{
-    //         console.log('cleaning up')
-    //     }
-    // }, []);
-
     useEffect(()=>{
         if(!user)return
+        onDisconnect(currentConversation).remove()
+        
+        return ()=>{
+            console.log('cleaning up')
+        }
+    }, []);
+
+    useEffect(()=>{ /* get data from friend's message */
+        if(!user)return
+        setEffectCounter()
         const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
         const unsubscribe = onValue(friendMessagesRef,(messageSnapshot)=>{
             if(!messageSnapshot.exists())return
@@ -48,14 +51,20 @@ const Chatroom = ()=>{
             
             const messagesArray = messageIDs.map(key => ({
                 id: key,
-                length: messagesData[key].length,
-                content: messagesData[key].content
+                dateCreated: messagesData[key].dateCreated,
+                content: messagesData[key].content,
+                sender:friendID
               }));
-            setMessages(messagesArray)
-            
+                        
+            messagesArray.forEach((message)=>{
+                if(existentIDs.has(message.id))return
+                setMessages(prevMessages => [message,...prevMessages])
+                existentIDs.add(message.id)
+            }) 
+
         })
         return()=>{
-            unsubscribe()
+            unsubscribe() 
         }
         
 
@@ -65,11 +74,22 @@ const Chatroom = ()=>{
         const messageID = generateRandomKey(20)
         const userMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages/${messageID}`)
         const currentDate = new Date()
-        try{
-            await set(userMessagesRef,{
+        const messageObject = {
             dateCreated:currentDate.getTime(),
             content:text
-          })  
+          }
+        try{
+            await set(userMessagesRef,messageObject)  
+            if(existentIDs.has(messageID))return
+            setMessages(prevMessages=>[{
+                id:messageID,
+                dateCreated:currentDate.getTime(),
+                content:text,
+                sender:user.uid,
+                },...prevMessages]);
+            // setExistentIDs(prevIDs=>[...prevIDs,messageID])
+            existentIDs.add(messageID)
+
         }
         catch(err){
             alert(err.message)
@@ -85,6 +105,17 @@ const Chatroom = ()=>{
         }
         return result;
     }
+
+    const forDate = (arr)=>{
+        /* sorts an array such as
+    [{dateCreated: 1713, name: 'mike'},
+    {dateCreated: 172, name: 'tyson'},
+    {dateCreated: 100, name: 'Bruno'}] in ascending order*/
+    arr.sort((a,b)=>
+        b.dateCreated-a.dateCreated
+    )
+    return arr
+}
 
     return <div>
         {(loadingUser||loadingSnapshotFriend)&&<p>loading…</p>}
@@ -103,7 +134,7 @@ const Chatroom = ()=>{
         
         {(user&&friendSnapshot&&userInConvo&&IDisRight)&&
         <div>
-            <p>welcome to chat room</p>
+            <p>welcome to chat room, {user.uid}</p>
             <form onSubmit={async(e)=>{
                 e.preventDefault()
                 await sendMessage(currentMessage)
@@ -113,12 +144,18 @@ const Chatroom = ()=>{
                 }}></input>
                 <button type="submit">Send</button>
             </form>
-            <ul>
+            <ul reversed>
                 {messages.map((messageObject)=>(
-                    
-                    <li key={messageObject.id}>{messageObject.content}</li>
+                    messageObject.sender===user.uid?
+                    <li key={messageObject.id}>{messageObject.content}</li>:
+                    <li key={messageObject.id} style={{color:"red"}} >{messageObject.content}</li>
+
                 ))}
             </ul>
+            <button onClick={()=>{
+                console.log(messages)
+            }}>messages?</button>
+            <Link to={'/chat'}>go back</Link>
         </div>
         
         
@@ -127,3 +164,4 @@ const Chatroom = ()=>{
     </div>
 }
 export default Chatroom
+

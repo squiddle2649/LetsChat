@@ -148,8 +148,6 @@ const HomePage = ()=>{
         </div>}
 
         {(inQueue)&&<p>finding someone…</p>}
-        
-        <button onClick={()=>{ addToConversation("random user")}}>add to convos</button>
     </div>
 }
 export default HomePage
