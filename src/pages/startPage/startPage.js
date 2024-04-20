@@ -66,8 +66,6 @@ const StartPage = () =>{
         checkDocumentExists(user.uid)
     }
     
-    
-    
     const generateRandomKey=(length)=> {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let result = '';

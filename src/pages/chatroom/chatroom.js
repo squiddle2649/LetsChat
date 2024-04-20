@@ -4,30 +4,41 @@ import { ref,set,onDisconnect,remove,onValue } from "firebase/database"
 import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect } from 'react';
+import { findRenderedComponentWithType } from "react-dom/test-utils"
 const Chatroom = ()=>{
     const {friendID} = useParams()
-    const [IDisRight, setIDisRight] = useState(false)
+    const [IDisRight, setIDisRight] = useState(`loading`)
     const [user,loadingUser,userError] = useAuthState(auth)
     const [messages,setMessages] = useState([])
+    const [friendDisconnected,setFriendDisconnected] = useState(false)
     const [currentMessage, setCurrentMessage] = useState("")
-    // const [existentIDs, setExistentIDs] = useState([])
+    const [username, setUsername] = useState(null)    
     const existentIDs = new Set();
-    const [effectCounter, setEffectCounter] = useState(0)
+
+    const usernameRef = 
+        user?ref( database,`Users/${user.uid}/username`):null
+    const [usernameSnapshot,loadingUsername,usernameError] = 
+    useObject(usernameRef)
+
     const conversationPartnerRef = 
         user?ref( database,`Users/${user.uid}/CurrentConversation/friend`):null
-        /* here we are getting data from the conversation partner of the user to 
-        make sure that he is the same as the friendID from the URL. If it isn't,
-        the we will have to throw an error. */
+        /* here we are getting data about the conversation partner in the user's
+        'CurrentConversation' collection to make sure that he is the same as the
+        friendID from the URL. If it isn't, then we will have to throw an error. */
 
     const [friendSnapshot,loadingSnapshotFriend,friendSnapshotError] = 
     useObject(conversationPartnerRef)
     
     const currentConversation = user? ref(database,`Users/${user.uid}/CurrentConversation`):null
-    const [userInConvo, loadingUserInConvo, errorUserInConvo] = useObject(currentConversation)
 
     useEffect(()=>{
-        if(!user||!friendSnapshot)return
+        if(!user||!friendSnapshot||!usernameSnapshot)return
+        /* If the user or the friendsnapshot isn't ready, then just return */
+        /* REMEMBER: FriendSnapshot is the ID of the friend written in the
+        user's own CurrentConversation collection */
+        setUsername(usernameSnapshot.val())
         setIDisRight(friendSnapshot.val()===friendID)
+
         //verifying that the ID in the URL really is the friend's ID.
     },[user,friendSnapshot])
 
@@ -40,9 +51,20 @@ const Chatroom = ()=>{
         }
     }, []);
 
+    useEffect(()=>{
+        const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
+        const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
+            if(!snapshot.exists()){
+                setFriendDisconnected(true)
+                return
+            }
+            else{
+                setFriendDisconnected(false)
+            }
+        })
+    })
+
     useEffect(()=>{ /* get data from friend's message */
-        if(!user)return
-        setEffectCounter()
         const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
         const unsubscribe = onValue(friendMessagesRef,(messageSnapshot)=>{
             if(!messageSnapshot.exists())return
@@ -55,7 +77,7 @@ const Chatroom = ()=>{
                 content: messagesData[key].content,
                 sender:friendID
               }));
-                        
+
             messagesArray.forEach((message)=>{
                 if(existentIDs.has(message.id))return
                 setMessages(prevMessages => [message,...prevMessages])
@@ -105,36 +127,20 @@ const Chatroom = ()=>{
         }
         return result;
     }
-
-    const forDate = (arr)=>{
-        /* sorts an array such as
-    [{dateCreated: 1713, name: 'mike'},
-    {dateCreated: 172, name: 'tyson'},
-    {dateCreated: 100, name: 'Bruno'}] in ascending order*/
-    arr.sort((a,b)=>
-        b.dateCreated-a.dateCreated
-    )
-    return arr
-}
-
     return <div>
-        {(loadingUser||loadingSnapshotFriend)&&<p>loading…</p>}
-        {(!IDisRight)&&
-            <div>
-                <p>wrong URL bro</p>
-                <Link to="/chat">back home?</Link> 
-
-            </div>
-        }
-        {(friendSnapshotError||userError)&& 
+        {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend)&&<p>loading…</p>}
+        {(friendSnapshotError||userError||!IDisRight)&& 
+        /* friendSnapshotError means something is wrong with the path 
+        'Users/user.uid/CurrentConversation/friend'*/
             <section>
                 <p>looks like something went wrong.</p>
                 <Link to="/chat">Go back home</Link> 
             </section>}
         
-        {(user&&friendSnapshot&&userInConvo&&IDisRight)&&
+        {(IDisRight&&user)&&
         <div>
-            <p>welcome to chat room, {user.uid}</p>
+            <p>welcome to chat room, {username}</p>
+            {(friendSnapshotError)&&<p>friend disconnected?</p>}
             <form onSubmit={async(e)=>{
                 e.preventDefault()
                 await sendMessage(currentMessage)
@@ -152,10 +158,21 @@ const Chatroom = ()=>{
 
                 ))}
             </ul>
-            <button onClick={()=>{
-                console.log(messages)
-            }}>messages?</button>
             <Link to={'/chat'}>go back</Link>
+            {(friendDisconnected)&&<p>looks like your friend has disconnected</p>}
+            <button onClick={()=>{
+                console.log(`friend disconnected: ${friendDisconnected}`)}}
+            >friend disconnected?</button>
+            <button onClick={()=>{
+                console.log(`id is correct? ${IDisRight}`)}}
+            >id right?</button>
+            <button onClick={()=>{
+                console.log(`snapshot friend loading?: ${loadingSnapshotFriend}`)}}
+            >snapshot friend loading?</button>
+            <button onClick={()=>{
+                console.log(`user loading?: ${loadingUser}`)}}
+            >user loading?</button>
+            
         </div>
         
         

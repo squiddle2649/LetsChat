@@ -67,6 +67,17 @@ const HomePage = ()=>{
     }
 
     useEffect(()=>{
+        if(!user)return
+        const userConvoRef = ref(database,`Users/${user.uid}/CurrentConversation`)
+
+        remove(userConvoRef)
+            
+        return()=>{
+            
+        }
+    },[])
+
+    useEffect(()=>{
         if(!inQueue){
             exitQueue()
             return
@@ -82,16 +93,6 @@ const HomePage = ()=>{
                     return
                 }
             })
-        // snapshotQ.forEach(async(document)=>{
-            // const documentID = document.key;
-            
-            // if(documentID!==user.uid){
-            //     exitQueue()
-            //     addToConversation(documentID)
-            //     navigate(`/chat/${documentID}`)
-                
-            // }
-        // })
         })
             
         return()=>{
