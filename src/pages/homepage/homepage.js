@@ -4,6 +4,7 @@ import {useAuthState,useSignOut} from 'react-firebase-hooks/auth'
 import {useObject} from 'react-firebase-hooks/database'
 import { useNavigate } from 'react-router-dom'
 import React, {  useState,useEffect } from 'react';
+import './homePageStyling.css'
 
 const HomePage = ()=>{
     const navigate = useNavigate()
@@ -128,20 +129,20 @@ const HomePage = ()=>{
     }, []);
 
 
-    return <div>
+    return <div className='homePageContainer flexCenter'>
         {(loadingLogout||loadingSnapshot||loadingUser)&&<p>loading…</p>}
         {(errorUser||snapshotError)&&<p>
             Looks like something went wrong. Try refreshing the page.</p>}
         {(snapshot&&user)&&
-        <div>
-            <p>welcome, {username}</p>
+        <div className='flexColumn flexCenter'>
+            <h1 className='roboto-light'>welcome, {username}</h1>
 
             {/* 1. If user is in the queue, he will be given an option to exit it.
                 2. if he is not in the queue, he will be given an option to enter */}
             {inQueue?<button onClick={exitQueue}>exit queue</button>
-            :<button onClick={enterQueue}>start chatting</button>}
+            :<button className='startChatBtn' onClick={enterQueue}><h2 className='roboto-regular'>Start chatting</h2> </button>}
             
-            <button onClick={async()=>{
+            <button className='signOutBtn' onClick={async()=>{
                 await exitQueue()
                 await signOut();
                 navigate('/')

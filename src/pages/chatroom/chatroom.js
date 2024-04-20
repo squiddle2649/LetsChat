@@ -1,10 +1,9 @@
 import { useParams,Link } from "react-router-dom"
 import { database,auth } from "firebaseConfig/firebase"
-import { ref,set,onDisconnect,remove,onValue } from "firebase/database"
+import { ref,set,onDisconnect,onValue } from "firebase/database"
 import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect } from 'react';
-import { findRenderedComponentWithType } from "react-dom/test-utils"
 const Chatroom = ()=>{
     const {friendID} = useParams()
     const [IDisRight, setIDisRight] = useState(`loading`)
@@ -40,7 +39,7 @@ const Chatroom = ()=>{
         setIDisRight(friendSnapshot.val()===friendID)
 
         //verifying that the ID in the URL really is the friend's ID.
-    },[user,friendSnapshot])
+    },[user,friendSnapshot,usernameSnapshot])
 
     useEffect(()=>{
         if(!user)return
@@ -62,6 +61,9 @@ const Chatroom = ()=>{
                 setFriendDisconnected(false)
             }
         })
+        return()=>{
+            unsubscribe() 
+        }
     })
 
     useEffect(()=>{ /* get data from friend's message */
@@ -160,18 +162,7 @@ const Chatroom = ()=>{
             </ul>
             <Link to={'/chat'}>go back</Link>
             {(friendDisconnected)&&<p>looks like your friend has disconnected</p>}
-            <button onClick={()=>{
-                console.log(`friend disconnected: ${friendDisconnected}`)}}
-            >friend disconnected?</button>
-            <button onClick={()=>{
-                console.log(`id is correct? ${IDisRight}`)}}
-            >id right?</button>
-            <button onClick={()=>{
-                console.log(`snapshot friend loading?: ${loadingSnapshotFriend}`)}}
-            >snapshot friend loading?</button>
-            <button onClick={()=>{
-                console.log(`user loading?: ${loadingUser}`)}}
-            >user loading?</button>
+            
             
         </div>
         

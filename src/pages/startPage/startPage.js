@@ -1,23 +1,23 @@
-import {set,onValue,ref,get} from 'firebase/database'
+import {set,ref} from 'firebase/database'
 import {signInAnonymously} from 'firebase/auth'
 import {database,auth} from 'firebaseConfig/firebase'
-import React, {  useState,useEffect } from 'react';
+import React, {  useState ,useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-
+import { useObject } from 'react-firebase-hooks/database';
 import {useNavigate} from 'react-router-dom'
 
+import './startPageStyling.css'
+import { GoArrow } from './startPageSVGs';
 
 const StartPage = () =>{
 
     const [username,setUsername]=useState("")
-    const [user, loading, error] = useAuthState(auth);
+    const [user, loadingUser, userError] = useAuthState(auth);
     const navigate = useNavigate()
-    
-    if(loading){
-        return <h1 style={{color:"red"}}>WHOAHOHLUISHEFIUHSELIUFHSLI</h1>
-    }
+    const userDocumentRef = user?ref(database, `Users/${user.uid}`):null
 
-    
+    const [userDocument, loadingUserDocument, errorUserDocument] = 
+        useObject(userDocumentRef)   
 
     const signIn = async()=>{
         try{
@@ -46,56 +46,56 @@ const StartPage = () =>{
         }
 
     }
-    const checkDocumentExists = async(id)=>{
-        try{
-            const documentRef = ref(database, `Users/${id}`)
-            const snapshot = await get(documentRef)
-            if(snapshot.exists()){
-                navigate('/chat')
-            }
-            else{
-                addUserToDatabase()
-            }
+    // const checkDocumentExists = async(id)=>{
+    //     if(userDocument.exists()){
+    //         navigate('/chat')
+    //     }
+    //     else{
+
+    //     }
+    //     try{
+    //         const documentRef = ref(database, `Users/${id}`)
+    //         const snapshot = await get(documentRef)
+    //         if(snapshot.exists()){
+    //             navigate('/chat')
+    //         }
+    //         else{
+    //             addUserToDatabase()
+    //         }
+    //     }
+    //     catch(err){
+    //         addUserToDatabase()
+    //     }
+        
+    // }
+    useEffect(()=>{
+        if(!user||!userDocument)return
+        if(userDocument.exists()){
+            navigate('/chat')
         }
-        catch(err){
+        else{
             addUserToDatabase()
         }
-        
-    }
-    if(user){
-        checkDocumentExists(user.uid)
-    }
+    },[userDocument,user])
     
-    const generateRandomKey=(length)=> {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-        return result;
-    }
-    const sortArray = (arr)=>{
-            /* sorts an array such as
-        [{dateCreated: 1713, username: 'mike'},
-        {dateCreated: 172, username: 'tyson'},
-        {dateCreated: 100, username: 'Bruno'}] in ascending order*/
-        arr.sort((a,b)=>
-            b.dateCreated-a.dateCreated
-        )
-        return arr
-    }
+    {/* If info is still loading, show loading screen */}
+    {/* If not loading, then show normal start page */}
 
-    return <div>
-        <form onSubmit={(e)=>{
+    return <div className='flexCenter startPageContainer roboto-regular'>
+        {(loadingUserDocument||loadingUser)?
+            /* If info is still loading, show loading screen */
+        <h1 style={{color:'green'}}>loading start page</h1>:
+            /* If it's no longer loading, then show normal start page */
+        <form className="flexCenter" onSubmit={(e)=>{
             e.preventDefault()
             signIn()
         }}>
-            <label>Hi, my name is </label>
-            <input required type="text"  onChange={(e)=>{
+            <label><h1>👋 Hi, my name is </h1></label>
+            <input className='nameInput' required type="text"  onChange={(e)=>{
                 setUsername(e.target.value)
             }}></input>    
-            <button type='submit'>Enter</button>
-        </form>        
+            <button className='enterButton flexCenter' type='submit'><GoArrow></GoArrow></button>
+        </form> }
         
         
     </div>
