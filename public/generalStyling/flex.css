@@ -1,6 +1,5 @@
 body{
     overflow-x:hidden ;
-    overflow-y: hidden;
 }
 
 .flexCenter{
@@ -17,8 +16,9 @@ body{
     display: flex;
     align-items: center;
 }
+
 .red{
-    background-color:red;
+    background-color:rgb(170, 215, 233);
 }
 
 .flexSpaceEvenly{

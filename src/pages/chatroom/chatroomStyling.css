@@ -1,24 +1,39 @@
+
+
 .chatroomContainer{
     height: 100vh;
+    margin: 0;
+    padding: 0;
+    
 }
 .chatroom{
-    height: 80%;
+    height: 69%;
     width:100%;
     position: relative;
-    background-color: aqua;
     overflow-y: scroll;
 }
 .messageForm{
-    height: 30px;
-    width: 100%;
+    height: 40px;
     display: flex;
+    margin-top: 10px;
+    margin-left: 4px;
+    width: 80%;
 }
+
 .messageInput{
+    padding: 5px;
     width: 100%;
+    border:none;
+    background-color: #bdbdbd;
+    border-radius: 10px;
+    font-size: 30px;
+    margin-right: 5px;/* a little distance from the button */
+}
+.messageInput:focus{
+    outline: none;
 }
 .listOfMessages{
-    /* position: absolute; */
-    /* bottom: 0; */
+    
     display: flex;
     flex-direction: column;
 }

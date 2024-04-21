@@ -1,11 +1,11 @@
 import { useParams,Link } from "react-router-dom"
 import { database,auth } from "firebaseConfig/firebase"
-import { ref,set,onDisconnect,onValue } from "firebase/database"
+import { ref,set,onDisconnect,onValue,get } from "firebase/database"
 import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect,useRef } from 'react';
 import './chatroomStyling.css'
-import './chatroomFlex.css'
+
 
 
 const Chatroom = ()=>{
@@ -16,6 +16,7 @@ const Chatroom = ()=>{
     const [friendDisconnected,setFriendDisconnected] = useState(false)
     const [currentMessage, setCurrentMessage] = useState("")
     const [username, setUsername] = useState(null)    
+    const [friendName, setFriendName] = useState(null)    
     const existentIDs = new Set();
     
     const chatroomRef = useRef(null)
@@ -26,12 +27,6 @@ const Chatroom = ()=>{
             left: 0,
             behavior: 'smooth'
         })
-        // chatroomRef.current.scrollTo({
-        //     top:chatroomRef.current.scrollHeight,
-        //     left: 0,
-        //     behavior: 'smooth'
-        // })
-
 
     }
 
@@ -50,7 +45,14 @@ const Chatroom = ()=>{
     const [friendSnapshot,loadingSnapshotFriend,friendSnapshotError] = 
     useObject(conversationPartnerRef)
     
-    const currentConversation = user? ref(database,`Users/${user.uid}/CurrentConversation`):null
+    
+    const friendNameRef = IDisRight?ref(database,`Users/${friendID}/username`):null
+    const [friendNameSnap, loadingFriendName, friendNameError] = useObject(friendNameRef)
+    
+    useEffect(()=>{
+        if(!IDisRight||!friendNameSnap)return
+        setFriendName(friendNameSnap.val())
+    })
 
     useEffect(()=>{
         if(!user||!friendSnapshot||!usernameSnapshot)return
@@ -65,6 +67,7 @@ const Chatroom = ()=>{
 
     useEffect(()=>{
         if(!user)return
+        const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
         onDisconnect(currentConversation).remove()
         
         return ()=>{
@@ -125,7 +128,7 @@ const Chatroom = ()=>{
             content:text
           }
         try{
-            // await set(userMessagesRef,messageObject)  
+            await set(userMessagesRef,messageObject)  
             if(existentIDs.has(messageID))return
             setMessages(prevMessages=>[...prevMessages,{
                 id:messageID,
@@ -133,7 +136,6 @@ const Chatroom = ()=>{
                 content:text,
                 sender:user.uid,
                 }]);
-            // setExistentIDs(prevIDs=>[...prevIDs,messageID])
             existentIDs.add(messageID)
 
 
@@ -152,50 +154,73 @@ const Chatroom = ()=>{
         }
         return result;
     }
-    return <div className="chatroomContainer">
-        <Link to={'/chat'}>go back</Link>
-            {/* {(friendDisconnected)&&<p>looks like your friend has disconnected</p>}
-            <p>welcome to chat room, {username}</p>
-            {(friendSnapshotError)&&<p>friend disconnected?</p>}
-        {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend)&&<p>loading…</p>}
-        {(friendSnapshotError||userError||!IDisRight)&&  */}
-         {/* friendSnapshotError means something is wrong with the path 
-        'Users/user.uid/CurrentConversation/friend' */}
-            {/* <section>
-                <p>looks like something went wrong.</p>
-                <Link to="/chat">Go back home</Link> 
-            </section>}
-        
-        {(IDisRight&&user)&& */}
-
-
+    return <div className="chatroomContainer arial-italic">
+        <Link to={'/chat'}><h2 style={{marginTop:'0'}}>GO BACK</h2></Link>
+        {(friendDisconnected)&&<p>looks like your friend has disconnected</p>}
             
-            <div ref={chatroomRef}  className="chatroom">
+        {(friendSnapshotError)&&<p>friend disconnected?</p>}
+        
+        
+        
+        {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend||loadingFriendName)&&<p>loading…</p>}
+        {(friendSnapshotError||userError||!IDisRight||friendNameError)&& 
+        /* friendSnapshotError means something is wrong with the path 
+        'Users/user.uid/CurrentConversation/friend'*/
+            <section>
+                <p>looks like something went wrong.</p>
+            </section>}
+
+        {(IDisRight&&user)&&
+
+            <div style={{height:"100%",width:"100%"}}>
+                <h1 /* style={{marginBottom:"0"}} */>Welcome to chatroom, {username}</h1>
+                <h3>You are talking to, {friendName}</h3>
+                    <div ref={chatroomRef}  className="chatroom">
                 
-                <ul className="listOfMessages" reversed>
-                    {messages.map((messageObject)=>(
-                        messageObject.sender===user.uid?
-                        <li key={messageObject.id}><h1>{messageObject.content}</h1></li>:
-                        <li key={messageObject.id} style={{color:"red"}} ><h1>{messageObject.content}</h1></li>
-                    ))}
-                </ul>
+                        <ul className="listOfMessages" reversed>
+                            {messages.map((messageObject)=>(
+                                <Message
+                                    username={messageObject.sender===user.uid?
+                                        username:friendName
+                                    }
+                                    key={messageObject.id}
+                                    content={messageObject.content}
+                                    me={messageObject.sender===user.uid}
+                                ></Message>
+                                // messageObject.sender===user.uid?
+                                // <li key={messageObject.id}><h1>{messageObject.content}</h1></li>:
+                                // <li key={messageObject.id} style={{color:"aqua"}} ><h1>{messageObject.content}</h1></li>
+                            ))}
+                        </ul>
+                    </div>
+                        <div className="formContainer flexCenter">
+                            <form className="messageForm " onSubmit={async(e)=>{
+                                e.preventDefault()
+                                messageInputRef.current.value = ""
+                                await sendMessage(currentMessage)
+                                scrollToBottom(chatroomRef.current)
+                            }}>
+                                <input ref ={messageInputRef} className="messageInput" onChange={(e)=>{
+                                    setCurrentMessage(e.target.value)
+                                }}></input>
+                                <button type="submit">Send</button>
+                            </form>
+                        </div>
             </div>
-                <form className="messageForm red" onSubmit={async(e)=>{
-                    e.preventDefault()
-                    messageInputRef.current.value = ""
-                    await sendMessage(currentMessage)
-                    scrollToBottom(chatroomRef.current)
-                }}>
-                    <input ref ={messageInputRef} className="messageInput" onChange={(e)=>{
-                        setCurrentMessage(e.target.value)
-                    }}></input>
-                    <button type="submit">Send</button>
-                </form>
+            
         
         
-    {/* } */}
+        } 
 
     </div>
 }
 export default Chatroom
 
+const Message = (props)=>{
+    return <div className="arial flexColumn">
+    <p className="username arial-bold" style={{
+        color: props.me?"#59b7db":"#cd4e67"
+    }}>{props.username}</p>
+    <h3 className="messageText">{props.content}</h3>
+</div>
+}

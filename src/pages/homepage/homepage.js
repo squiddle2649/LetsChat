@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import React, {  useState,useEffect } from 'react';
 import './homePageStyling.css'
 
+
 const HomePage = ()=>{
     const navigate = useNavigate()
     const [user, loadingUser, errorUser] = useAuthState(auth);
@@ -129,7 +130,7 @@ const HomePage = ()=>{
     }, []);
 
 
-    return <div className='homePageContainer flexCenter red'>
+    return <div className='homePageContainer flexCenter red '>
         {(loadingLogout||loadingSnapshot||loadingUser)&&<p>loading…</p>}
         {(errorUser||snapshotError)&&<p>
             Looks like something went wrong. Try refreshing the page.</p>}
