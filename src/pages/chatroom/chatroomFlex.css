@@ -1,0 +1,56 @@
+body{
+    overflow-x:hidden ;
+    overflow-y: hidden;
+}
+
+.flexCenter{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+.flexCenterAlignStart{
+    display:flex;
+    justify-content: center;
+    align-items: start;
+}
+.flexAlignCenter{
+    display: flex;
+    align-items: center;
+}
+.red{
+    background-color:red;
+}
+
+.flexSpaceEvenly{
+    display:flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+.flexSpaceAround{
+    display:flex;
+    justify-content:space-around;
+    align-items: center;
+}
+.flexSpaceBetween{
+    display:flex;
+    justify-content:space-between;
+    align-items: center;
+}
+.flexLeft{
+    display:flex;
+    justify-content: start;
+    align-items: center;
+}
+.flexRight{
+    display:flex;
+    justify-content: end;
+    align-items: center;
+}
+.flexColumn{
+    display: flex;
+    flex-direction:column;
+}
+.flexRow{
+    display: flex;
+    flex-direction:row;
+}
