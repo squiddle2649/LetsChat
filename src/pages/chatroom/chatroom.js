@@ -3,8 +3,10 @@ import { database,auth } from "firebaseConfig/firebase"
 import { ref,set,onDisconnect,onValue } from "firebase/database"
 import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
-import React, {  useState,useEffect } from 'react';
+import React, {  useState,useEffect,useRef } from 'react';
 import './chatroomStyling.css'
+import './chatroomFlex.css'
+
 
 const Chatroom = ()=>{
     const {friendID} = useParams()
@@ -15,6 +17,24 @@ const Chatroom = ()=>{
     const [currentMessage, setCurrentMessage] = useState("")
     const [username, setUsername] = useState(null)    
     const existentIDs = new Set();
+    
+    const chatroomRef = useRef(null)
+    const messageInputRef = useRef(null)
+    const scrollToBottom = (element)=>{
+        element.scrollTo({
+            top:element.scrollHeight,
+            left: 0,
+            behavior: 'smooth'
+        })
+        // chatroomRef.current.scrollTo({
+        //     top:chatroomRef.current.scrollHeight,
+        //     left: 0,
+        //     behavior: 'smooth'
+        // })
+
+
+    }
+
 
     const usernameRef = 
         user?ref( database,`Users/${user.uid}/username`):null
@@ -116,6 +136,7 @@ const Chatroom = ()=>{
             // setExistentIDs(prevIDs=>[...prevIDs,messageID])
             existentIDs.add(messageID)
 
+
         }
         catch(err){
             alert(err.message)
@@ -131,7 +152,7 @@ const Chatroom = ()=>{
         }
         return result;
     }
-    return <div className="chatroomContainer ">
+    return <div className="chatroomContainer">
         <Link to={'/chat'}>go back</Link>
             {/* {(friendDisconnected)&&<p>looks like your friend has disconnected</p>}
             <p>welcome to chat room, {username}</p>
@@ -149,7 +170,7 @@ const Chatroom = ()=>{
 
 
             
-            <div className="chatroom flexCenter red">
+            <div ref={chatroomRef}  className="chatroom">
                 
                 <ul className="listOfMessages" reversed>
                     {messages.map((messageObject)=>(
@@ -161,9 +182,11 @@ const Chatroom = ()=>{
             </div>
                 <form className="messageForm red" onSubmit={async(e)=>{
                     e.preventDefault()
+                    messageInputRef.current.value = ""
                     await sendMessage(currentMessage)
+                    scrollToBottom(chatroomRef.current)
                 }}>
-                    <input className="messageInput" onChange={(e)=>{
+                    <input ref ={messageInputRef} className="messageInput" onChange={(e)=>{
                         setCurrentMessage(e.target.value)
                     }}></input>
                     <button type="submit">Send</button>

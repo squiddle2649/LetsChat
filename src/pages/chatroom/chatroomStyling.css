@@ -6,8 +6,8 @@
     width:100%;
     position: relative;
     background-color: aqua;
+    overflow-y: scroll;
 }
-
 .messageForm{
     height: 30px;
     width: 100%;
@@ -17,6 +17,8 @@
     width: 100%;
 }
 .listOfMessages{
-    position: absolute;
-    bottom: 0;
+    /* position: absolute; */
+    /* bottom: 0; */
+    display: flex;
+    flex-direction: column;
 }
