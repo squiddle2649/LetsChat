@@ -11,9 +11,19 @@
     width: 300px;
     border-radius: 20px;
     border: none;
-    background-color: rgb(54, 54, 54);
+    background-color: rgb(31, 31, 31);
     color: white;
+    margin: 30px;
+    cursor: pointer;
+    transition-duration: 400ms;
 }
 .startChatBtn:hover{
     background-color: rgb(91, 91, 91);
+}
+.welcomeText{
+    margin-bottom: 0;
+}
+.searchingText{
+    margin-top: 30px;
+
 }

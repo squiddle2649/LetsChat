@@ -4,6 +4,8 @@ import { ref,set,onDisconnect,onValue } from "firebase/database"
 import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect } from 'react';
+import './chatroomStyling.css'
+
 const Chatroom = ()=>{
     const {friendID} = useParams()
     const [IDisRight, setIDisRight] = useState(`loading`)
@@ -82,7 +84,7 @@ const Chatroom = ()=>{
 
             messagesArray.forEach((message)=>{
                 if(existentIDs.has(message.id))return
-                setMessages(prevMessages => [message,...prevMessages])
+                setMessages(prevMessages => [...prevMessages,message])
                 existentIDs.add(message.id)
             }) 
 
@@ -103,14 +105,14 @@ const Chatroom = ()=>{
             content:text
           }
         try{
-            await set(userMessagesRef,messageObject)  
+            // await set(userMessagesRef,messageObject)  
             if(existentIDs.has(messageID))return
-            setMessages(prevMessages=>[{
+            setMessages(prevMessages=>[...prevMessages,{
                 id:messageID,
                 dateCreated:currentDate.getTime(),
                 content:text,
                 sender:user.uid,
-                },...prevMessages]);
+                }]);
             // setExistentIDs(prevIDs=>[...prevIDs,messageID])
             existentIDs.add(messageID)
 
@@ -129,45 +131,46 @@ const Chatroom = ()=>{
         }
         return result;
     }
-    return <div>
+    return <div className="chatroomContainer ">
+        <Link to={'/chat'}>go back</Link>
+            {/* {(friendDisconnected)&&<p>looks like your friend has disconnected</p>}
+            <p>welcome to chat room, {username}</p>
+            {(friendSnapshotError)&&<p>friend disconnected?</p>}
         {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend)&&<p>loading…</p>}
-        {(friendSnapshotError||userError||!IDisRight)&& 
-        /* friendSnapshotError means something is wrong with the path 
-        'Users/user.uid/CurrentConversation/friend'*/
-            <section>
+        {(friendSnapshotError||userError||!IDisRight)&&  */}
+         {/* friendSnapshotError means something is wrong with the path 
+        'Users/user.uid/CurrentConversation/friend' */}
+            {/* <section>
                 <p>looks like something went wrong.</p>
                 <Link to="/chat">Go back home</Link> 
             </section>}
         
-        {(IDisRight&&user)&&
-        <div>
-            <p>welcome to chat room, {username}</p>
-            {(friendSnapshotError)&&<p>friend disconnected?</p>}
-            <form onSubmit={async(e)=>{
-                e.preventDefault()
-                await sendMessage(currentMessage)
-            }}>
-                <input onChange={(e)=>{
-                    setCurrentMessage(e.target.value)
-                }}></input>
-                <button type="submit">Send</button>
-            </form>
-            <ul reversed>
-                {messages.map((messageObject)=>(
-                    messageObject.sender===user.uid?
-                    <li key={messageObject.id}>{messageObject.content}</li>:
-                    <li key={messageObject.id} style={{color:"red"}} >{messageObject.content}</li>
+        {(IDisRight&&user)&& */}
 
-                ))}
-            </ul>
-            <Link to={'/chat'}>go back</Link>
-            {(friendDisconnected)&&<p>looks like your friend has disconnected</p>}
+
             
-            
-        </div>
+            <div className="chatroom flexCenter red">
+                
+                <ul className="listOfMessages" reversed>
+                    {messages.map((messageObject)=>(
+                        messageObject.sender===user.uid?
+                        <li key={messageObject.id}><h1>{messageObject.content}</h1></li>:
+                        <li key={messageObject.id} style={{color:"red"}} ><h1>{messageObject.content}</h1></li>
+                    ))}
+                </ul>
+            </div>
+                <form className="messageForm red" onSubmit={async(e)=>{
+                    e.preventDefault()
+                    await sendMessage(currentMessage)
+                }}>
+                    <input className="messageInput" onChange={(e)=>{
+                        setCurrentMessage(e.target.value)
+                    }}></input>
+                    <button type="submit">Send</button>
+                </form>
         
         
-        }
+    {/* } */}
 
     </div>
 }

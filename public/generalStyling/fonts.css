@@ -1,74 +1,54 @@
-.roboto-thin {
-    font-family: "Roboto", sans-serif;
-    font-weight: 100;
-    font-style: normal;
-  }
-  
-  .roboto-light {
-    font-family: "Roboto", sans-serif;
-    font-weight: 300;
-    font-style: normal;
-  }
-  
-  .roboto-regular {
-    font-family: "Roboto", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-  }
-  
-  .roboto-medium {
-    font-family: "Roboto", sans-serif;
-    font-weight: 500;
-    font-style: normal;
-  }
-  
-  .roboto-bold {
-    font-family: "Roboto", sans-serif;
-    font-weight: 700;
-    font-style: normal;
-  }
-  
-  .roboto-black {
-    font-family: "Roboto", sans-serif;
-    font-weight: 900;
-    font-style: normal;
-  }
-  
-  .roboto-thin-italic {
-    font-family: "Roboto", sans-serif;
-    font-weight: 100;
-    font-style: italic;
-  }
-  
-  .roboto-light-italic {
-    font-family: "Roboto", sans-serif;
-    font-weight: 300;
-    font-style: italic;
-  }
-  
-  .roboto-regular-italic {
-    font-family: "Roboto", sans-serif;
-    font-weight: 400;
-    font-style: italic;
-  }
-  
-  .roboto-medium-italic {
-    font-family: "Roboto", sans-serif;
-    font-weight: 500;
-    font-style: italic;
-  }
-  
-  .roboto-bold-italic {
-    font-family: "Roboto", sans-serif;
-    font-weight: 700;
-    font-style: italic;
-  }
-  
-  .roboto-black-italic {
-    font-family: "Roboto", sans-serif;
-    font-weight: 900;
-    font-style: italic;
-  }
-  h2{
-    letter-spacing: 0.4px;
-  }
+
+/* ARIALARIALARIALARIALARIALARIALARIALARIALARIALARIALARIALARIALARIALARIALARIALARIALARIALARIAL */
+@font-face {
+    font-family: 'arial';
+    src:url('../myFonts/Arial/Arial.ttf')
+}
+@font-face {
+    font-family: 'arial-black';
+    src:url('../myFonts/Arial/Arial\ Black.ttf')
+}
+@font-face {
+    font-family: 'arial-bold';
+    src:url('../myFonts/Arial/Arial\ Bold.ttf')
+}
+@font-face {
+    font-family: 'arial-italic';
+    src:url('../myFonts/Arial/Arial\ Italic.ttf')
+}
+@font-face {
+    font-family: 'arial-narrow';
+    src:url('../myFonts/Arial/Arial\ Narrow.ttf')
+}
+@font-face {
+    font-family: 'arial-bold-italic';
+    src:url('../myFonts/Arial/Arial\ Bold\ Italic.ttf')
+}
+@font-face {
+    font-family: 'arial-narrow-bold-italic';
+    src:url('../myFonts/Arial/Arial\ Narrow\ Bold\ Italic.ttf')
+}
+@font-face {
+    font-family: 'arial-narrow-bold';
+    src:url('../myFonts/Arial/Arial\ Narrow\ Bold.ttf')
+}
+@font-face {
+    font-family: 'arial-narrow-italic';
+    src:url('../myFonts/Arial/Arial\ Narrow\ Italic.ttf')
+}
+
+.arial{
+    font-family: arial;
+}
+.arial-black{
+    font-family: arial-black;
+}
+.arial-bold{
+    font-family: arial-bold;
+}
+.arial-italic{
+    font-family: arial-italic;
+}
+.arial-narrow{
+    font-family: arial-narrow;
+}

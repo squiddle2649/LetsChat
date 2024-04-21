@@ -81,7 +81,7 @@ const StartPage = () =>{
     {/* If info is still loading, show loading screen */}
     {/* If not loading, then show normal start page */}
 
-    return <div className='flexCenter startPageContainer roboto-regular'>
+    return <div className='flexCenter startPageContainer arial'>
         {(loadingUserDocument||loadingUser)?
             /* If info is still loading, show loading screen */
         <h1 style={{color:'green'}}>loading start page</h1>:

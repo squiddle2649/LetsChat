@@ -129,18 +129,30 @@ const HomePage = ()=>{
     }, []);
 
 
-    return <div className='homePageContainer flexCenter'>
+    return <div className='homePageContainer flexCenter red'>
         {(loadingLogout||loadingSnapshot||loadingUser)&&<p>loading…</p>}
         {(errorUser||snapshotError)&&<p>
             Looks like something went wrong. Try refreshing the page.</p>}
         {(snapshot&&user)&&
         <div className='flexColumn flexCenter'>
-            <h1 className='roboto-light'>welcome, {username}</h1>
+            <h1 className='arial welcomeText'>Welcome, {username}</h1>
 
             {/* 1. If user is in the queue, he will be given an option to exit it.
                 2. if he is not in the queue, he will be given an option to enter */}
-            {inQueue?<button onClick={exitQueue}>exit queue</button>
-            :<button className='startChatBtn' onClick={enterQueue}><h2 className='roboto-regular'>Start chatting</h2> </button>}
+            {inQueue?
+            <div className='flexColumn flexCenter'>
+                <p className='arial searchingText'>Searching…</p>
+                <button className ="startChatBtn" onClick={exitQueue}>
+                    <h2 className="arial">Exit queue</h2>
+                </button>
+            </div>
+            :
+            <div>
+                <button className='startChatBtn' onClick={enterQueue}>
+                    <h2 className='arial'>Start chatting</h2>
+                </button>
+            </div>
+            }
             
             <button className='signOutBtn' onClick={async()=>{
                 await exitQueue()
@@ -149,7 +161,6 @@ const HomePage = ()=>{
             }}>sign out</button>
         </div>}
 
-        {(inQueue)&&<p>finding someone…</p>}
     </div>
 }
 export default HomePage

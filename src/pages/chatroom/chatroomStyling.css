@@ -1,0 +1,22 @@
+.chatroomContainer{
+    height: 100vh;
+}
+.chatroom{
+    height: 80%;
+    width:100%;
+    position: relative;
+    background-color: aqua;
+}
+
+.messageForm{
+    height: 30px;
+    width: 100%;
+    display: flex;
+}
+.messageInput{
+    width: 100%;
+}
+.listOfMessages{
+    position: absolute;
+    bottom: 0;
+}

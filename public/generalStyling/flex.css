@@ -1,11 +1,12 @@
 body{
     overflow-x:hidden ;
+    overflow-y: hidden;
 }
 
 .flexCenter{
     display:flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
 }
 .flexCenterAlignStart{
     display:flex;
@@ -16,11 +17,23 @@ body{
     display: flex;
     align-items: center;
 }
-
+.red{
+    background-color:red;
+}
 
 .flexSpaceEvenly{
     display:flex;
     justify-content: space-evenly;
+    align-items: center;
+}
+.flexSpaceAround{
+    display:flex;
+    justify-content:space-around;
+    align-items: center;
+}
+.flexSpaceBetween{
+    display:flex;
+    justify-content:space-between;
     align-items: center;
 }
 .flexLeft{
