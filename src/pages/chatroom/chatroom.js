@@ -25,7 +25,6 @@ const Chatroom = ()=>{
         element.scrollTo({
             top:element.scrollHeight,
             left: 0,
-            behavior: 'smooth'
         })
 
     }
@@ -52,7 +51,7 @@ const Chatroom = ()=>{
     useEffect(()=>{
         if(!IDisRight||!friendNameSnap)return
         setFriendName(friendNameSnap.val())
-    })
+    },[IDisRight,friendNameSnap])
 
     useEffect(()=>{
         if(!user||!friendSnapshot||!usernameSnapshot)return
@@ -118,7 +117,9 @@ const Chatroom = ()=>{
         
 
     },[])
-
+    useEffect(()=>{
+        scrollToBottom(chatroomRef.current)
+    },[messages])
     const sendMessage = async(text)=>{
         const messageID = generateRandomKey(20)
         const userMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages/${messageID}`)
@@ -143,6 +144,9 @@ const Chatroom = ()=>{
         catch(err){
             alert(err.message)
         }
+        // finally{
+        //     scrollToBottom(chatroomRef.current)
+        // }
 
     }
 
@@ -154,8 +158,8 @@ const Chatroom = ()=>{
         }
         return result;
     }
-    return <div className="chatroomContainer arial-italic">
-        <Link to={'/chat'}><h2 style={{marginTop:'0'}}>GO BACK</h2></Link>
+    return <div className="chatroomContainer arial-italic ">
+
         {(friendDisconnected)&&<p>looks like your friend has disconnected</p>}
             
         {(friendSnapshotError)&&<p>friend disconnected?</p>}
@@ -168,13 +172,16 @@ const Chatroom = ()=>{
         'Users/user.uid/CurrentConversation/friend'*/
             <section>
                 <p>looks like something went wrong.</p>
+                <Link to={'/chat'}><h2 style={{marginTop:'0'}}>GO BACK</h2></Link>
             </section>}
 
         {(IDisRight&&user)&&
-
-            <div style={{height:"100%",width:"100%"}}>
-                <h1 /* style={{marginBottom:"0"}} */>Welcome to chatroom, {username}</h1>
-                <h3>You are talking to, {friendName}</h3>
+            <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
+                <div className="chatHeader flexLeft red">
+                    <Link to={'/chat'}><h2 style={{marginLeft:'18px',marginRight:"18px"}}>GO BACK</h2></Link>
+                    <div className="vl"></div>
+                    <h3 style={{marginLeft:'18px'}}>{friendName}</h3>
+                </div>
                     <div ref={chatroomRef}  className="chatroom">
                 
                         <ul className="listOfMessages" reversed>
@@ -198,7 +205,7 @@ const Chatroom = ()=>{
                                 e.preventDefault()
                                 messageInputRef.current.value = ""
                                 await sendMessage(currentMessage)
-                                scrollToBottom(chatroomRef.current)
+
                             }}>
                                 <input ref ={messageInputRef} className="messageInput" onChange={(e)=>{
                                     setCurrentMessage(e.target.value)

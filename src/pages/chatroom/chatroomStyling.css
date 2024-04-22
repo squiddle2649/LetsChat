@@ -8,9 +8,17 @@
 }
 .chatroom{
     height: 69%;
-    width:100%;
+    width:80%;
     position: relative;
     overflow-y: scroll;
+    background-color: rgb(250, 228, 152);
+    border-radius: 15px;
+}
+.chatroom::-webkit-scrollbar-thumb{
+    background-color: orange;
+}
+.formContainer{
+    width: 100%;
 }
 .messageForm{
     height: 40px;
@@ -33,7 +41,16 @@
     outline: none;
 }
 .listOfMessages{
-    
     display: flex;
     flex-direction: column;
+}
+.chatHeader{
+    width: 80%;
+    margin-bottom: 10px;
+    border-radius: 15px;
+}
+.vl{
+    height: 100%;
+    width: 2px;
+    background-color: rgb(110, 135, 175);
 }
