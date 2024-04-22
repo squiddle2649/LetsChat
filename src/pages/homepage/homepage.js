@@ -136,20 +136,20 @@ const HomePage = ()=>{
             Looks like something went wrong. Try refreshing the page.</p>}
         {(snapshot&&user)&&
         <div className='flexColumn flexCenter'>
-            <h1 className='arial-italic welcomeText'>Welcome, {username}</h1>
+            <h1 className='arial-bold-italic tight welcomeText'>Welcome, {username}</h1>
 
             {/* 1. If user is in the queue, he will be given an option to exit it.
                 2. if he is not in the queue, he will be given an option to enter */}
             {inQueue?
             <div className='flexColumn flexCenter'>
                 <p className='arial searchingText'>Searching…</p>
-                <button className ="startChatBtn " onClick={exitQueue}>
+                <button className ="startChatBtn redBGhover noBorder pointer whiteText " onClick={exitQueue}>
                     <h2 className="arial">Exit queue</h2>
                 </button>
             </div>
             :
             <div>
-                <button className='startChatBtn ' onClick={enterQueue}>
+                <button className='startChatBtn redBGhover noBorder pointer whiteText' onClick={enterQueue}>
                     <h2 className='arial'>Start chatting</h2>
                 </button>
             </div>

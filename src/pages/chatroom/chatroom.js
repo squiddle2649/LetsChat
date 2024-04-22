@@ -23,6 +23,7 @@ const Chatroom = ()=>{
     const chatroomRef = useRef(null)
     const messageInputRef = useRef(null)
     const scrollToBottom = (element)=>{
+        if(user&&IDisRight)
         element.scrollTo({
             top:element.scrollHeight,
             left: 0,
@@ -65,31 +66,31 @@ const Chatroom = ()=>{
         //verifying that the ID in the URL really is the friend's ID.
     },[user,friendSnapshot,usernameSnapshot])
 
-    useEffect(()=>{
-        if(!user)return
-        const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
-        onDisconnect(currentConversation).remove()
+    // useEffect(()=>{
+    //     if(!user)return
+    //     const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
+    //     onDisconnect(currentConversation).remove()
         
-        return ()=>{
-            console.log('cleaning up')
-        }
-    }, []);
+    //     return ()=>{
+    //         console.log('cleaning up')
+    //     }
+    // }, []);
 
-    useEffect(()=>{
-        const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
-        const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
-            if(!snapshot.exists()){
-                setFriendDisconnected(true)
-                return
-            }
-            else{
-                setFriendDisconnected(false)
-            }
-        })
-        return()=>{
-            unsubscribe() 
-        }
-    })
+    // useEffect(()=>{
+    //     const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
+    //     const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
+    //         if(!snapshot.exists()){
+    //             setFriendDisconnected(true)
+    //             return
+    //         }
+    //         else{
+    //             setFriendDisconnected(false)
+    //         }
+    //     })
+    //     return()=>{
+    //         unsubscribe() 
+    //     }
+    // })
 
     useEffect(()=>{ /* get data from friend's message */
         const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
@@ -196,7 +197,7 @@ const Chatroom = ()=>{
         {(IDisRight&&user)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
                 <button onClick={resetMessages}>reset messages</button>
-                <div className="chatHeader flexLeft darker">
+                <div className="chatHeader flexLeft redBG">
                     <Link to={'/chat'}> <House></House> </Link>
                     <div className="vl"></div>
                     <h2 className="arial-bold tight whiteText" style={{marginLeft:'18px'}}>You are speaking to {friendName}</h2>
@@ -226,10 +227,10 @@ const Chatroom = ()=>{
                                 await sendMessage(currentMessage)
 
                             }}>
-                                <input ref ={messageInputRef} className="messageInput darker" onChange={(e)=>{
+                                <input ref ={messageInputRef} className="messageInput redBG" onChange={(e)=>{
                                     setCurrentMessage(e.target.value)
                                 }}></input>
-                                <button type="submit" className="sendButton darker noBorder flexCenter"> <Send></Send> </button>
+                                <button type="submit" className="sendButton redBGhover pointer noBorder"> <Send></Send> </button>
                             </form>
                         </div>
             </div>

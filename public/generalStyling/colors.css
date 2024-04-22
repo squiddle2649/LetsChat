@@ -1,25 +1,6 @@
 body{
-    /* pallete */
-    --orange:rgb(236, 204, 196);
-    --peach:#F7C59F;
-    --beige:#EFEFD0;
-    --dark-blue:#004E89;
-    --light-blue:#277ab9;
-}
-.orangeBG{
-    background-color: var(--orange);
-}
-.peachBG{
-    background-color: var(--peach);
-}
-.beigeBG{
-    background-color: var(--beige);
-}
-.darkBlueBG{
-    background-color: var(--dark-blue);
-}
-.lightBlueBG{
-    background-color: var(--light-blue);
+    --dark-red:#cf3b56;
+    --darker-red:#7e2435;
 }
 .blackBG{
     background-color: black;
@@ -27,22 +8,20 @@ body{
 .whiteBG{
     background-color: white;
 }
+.redBG{
+    background-color: var(--dark-red);
+}
+.redBGhover{
+    background-color: var(--dark-red);
+    transition-duration: 400ms;
+}
+.redBGhover:hover{
+    background-color: var(--darker-red);
+}
+.pointer{
+    cursor:pointer
+}
 
-.orangeText{
-    color: var(--orange);
-}
-.peachText{
-    color: var(--peach);
-}
-.beigeText{
-    color: var(--beige);
-}
-.darkBlueText{
-    color: var(--dark-blue);
-}
-.lightBlueText{
-    color: var(--light-blue);
-}
 
 .whiteText{
     color: white;

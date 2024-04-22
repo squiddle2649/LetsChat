@@ -10,11 +10,12 @@
     width:80%;
     position: relative;
     overflow-y: scroll;
+    word-break: break-word;
     border-radius: 15px;
 }
-.chatroom::-webkit-scrollbar-thumb{
-    background-color: orange;
-}
+/* 
+Ahrefs’ Paragraph Generator can be utilized to quickly generate engaging and informative paragraphs for various types of content. Whether it's blog posts, articles, product descriptions, or social media captions, the tool can assist in generating compelling paragraphs, saving time and effort for content creators.
+*/
 .formContainer{
     width: 100%;
 }
@@ -54,14 +55,9 @@
 .vl{
     height: 100%;
     width: 2px;
-    background-color: #fbc5cf;
+    /* background-color: #fbc5cf; */
 }
 
 .sendButton{
     border-radius: 15px;
-    cursor: pointer;
-    transition-duration: 400ms;
-}
-.sendButton:hover{
-    background-color: #7e2435;
 }

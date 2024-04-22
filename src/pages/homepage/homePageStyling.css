@@ -1,7 +1,6 @@
 .homePageContainer{
     height: 100vh;
     position: relative;
-    background-color: rgb(236, 204, 196);
 }
 .signOutBtn{
     position: absolute;
@@ -9,17 +8,9 @@
     right: 30px;
 }
 .startChatBtn{
-    width: 300px;
+    padding: 5px 100px;
     border-radius: 20px;
-    border: none;
-    background-color: rgb(187, 108, 108);
-    color: white;
     margin: 30px;
-    cursor: pointer;
-    transition-duration: 400ms;
-}
-.startChatBtn:hover{
-    background-color: rgb(91, 91, 91);
 }
 .welcomeText{
     margin-bottom: 0;
