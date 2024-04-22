@@ -55,3 +55,7 @@
 .arial-narrow{
     font-family: arial-narrow;
 }
+
+.tight{
+    letter-spacing: -0.025em;
+}

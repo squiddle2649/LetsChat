@@ -17,10 +17,6 @@ body{
     align-items: center;
 }
 
-.red{
-    background-color:rgb(170, 215, 233);
-}
-
 .flexSpaceEvenly{
     display:flex;
     justify-content: space-evenly;

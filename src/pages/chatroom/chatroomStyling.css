@@ -4,14 +4,12 @@
     height: 100vh;
     margin: 0;
     padding: 0;
-    
 }
 .chatroom{
     height: 69%;
     width:80%;
     position: relative;
     overflow-y: scroll;
-    background-color: rgb(250, 228, 152);
     border-radius: 15px;
 }
 .chatroom::-webkit-scrollbar-thumb{
@@ -28,14 +26,17 @@
     width: 80%;
 }
 
+.darker{
+    background-color: #cf3b56;
+}
 .messageInput{
     padding: 5px;
     width: 100%;
     border:none;
-    background-color: #bdbdbd;
     border-radius: 10px;
-    font-size: 30px;
+    font-size: 17px;
     margin-right: 5px;/* a little distance from the button */
+    color: white;
 }
 .messageInput:focus{
     outline: none;
@@ -48,9 +49,19 @@
     width: 80%;
     margin-bottom: 10px;
     border-radius: 15px;
+    border: 2px solid #222828;
 }
 .vl{
     height: 100%;
     width: 2px;
-    background-color: rgb(110, 135, 175);
+    background-color: #fbc5cf;
+}
+
+.sendButton{
+    border-radius: 15px;
+    cursor: pointer;
+    transition-duration: 400ms;
+}
+.sendButton:hover{
+    background-color: #7e2435;
 }

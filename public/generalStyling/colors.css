@@ -1,0 +1,55 @@
+body{
+    /* pallete */
+    --orange:rgb(236, 204, 196);
+    --peach:#F7C59F;
+    --beige:#EFEFD0;
+    --dark-blue:#004E89;
+    --light-blue:#277ab9;
+}
+.orangeBG{
+    background-color: var(--orange);
+}
+.peachBG{
+    background-color: var(--peach);
+}
+.beigeBG{
+    background-color: var(--beige);
+}
+.darkBlueBG{
+    background-color: var(--dark-blue);
+}
+.lightBlueBG{
+    background-color: var(--light-blue);
+}
+.blackBG{
+    background-color: black;
+}
+.whiteBG{
+    background-color: white;
+}
+
+.orangeText{
+    color: var(--orange);
+}
+.peachText{
+    color: var(--peach);
+}
+.beigeText{
+    color: var(--beige);
+}
+.darkBlueText{
+    color: var(--dark-blue);
+}
+.lightBlueText{
+    color: var(--light-blue);
+}
+
+.whiteText{
+    color: white;
+}
+.blackText{
+    color: black;
+}
+.noBorder{
+    border: 0;
+}

@@ -1,10 +1,11 @@
 import { useParams,Link } from "react-router-dom"
 import { database,auth } from "firebaseConfig/firebase"
-import { ref,set,onDisconnect,onValue,get } from "firebase/database"
+import { ref,set,onDisconnect,onValue,get, remove } from "firebase/database"
 import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect,useRef } from 'react';
 import './chatroomStyling.css'
+import { House,Send } from "./chatroomSVG"
 
 
 
@@ -150,6 +151,21 @@ const Chatroom = ()=>{
 
     }
 
+    const resetMessages = async()=>{
+        const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
+        const myMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages`)
+        try{
+            await remove(friendMessagesRef)
+            await remove(myMessagesRef)
+            setMessages([])
+        }
+        catch(err){
+            alert(err.message)
+        }
+        
+
+    }
+
     const generateRandomKey=(length)=> {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let result = '';
@@ -158,7 +174,7 @@ const Chatroom = ()=>{
         }
         return result;
     }
-    return <div className="chatroomContainer arial-italic ">
+    return <div className="chatroomContainer arial ">
 
         {(friendDisconnected)&&<p>looks like your friend has disconnected</p>}
             
@@ -172,15 +188,18 @@ const Chatroom = ()=>{
         'Users/user.uid/CurrentConversation/friend'*/
             <section>
                 <p>looks like something went wrong.</p>
-                <Link to={'/chat'}><h2 style={{marginTop:'0'}}>GO BACK</h2></Link>
+                <Link to={'/chat'}>
+                    <House></House>
+                </Link>
             </section>}
 
         {(IDisRight&&user)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
-                <div className="chatHeader flexLeft red">
-                    <Link to={'/chat'}><h2 style={{marginLeft:'18px',marginRight:"18px"}}>GO BACK</h2></Link>
+                <button onClick={resetMessages}>reset messages</button>
+                <div className="chatHeader flexLeft darker">
+                    <Link to={'/chat'}> <House></House> </Link>
                     <div className="vl"></div>
-                    <h3 style={{marginLeft:'18px'}}>{friendName}</h3>
+                    <h2 className="arial-bold tight whiteText" style={{marginLeft:'18px'}}>You are speaking to {friendName}</h2>
                 </div>
                     <div ref={chatroomRef}  className="chatroom">
                 
@@ -207,10 +226,10 @@ const Chatroom = ()=>{
                                 await sendMessage(currentMessage)
 
                             }}>
-                                <input ref ={messageInputRef} className="messageInput" onChange={(e)=>{
+                                <input ref ={messageInputRef} className="messageInput darker" onChange={(e)=>{
                                     setCurrentMessage(e.target.value)
                                 }}></input>
-                                <button type="submit">Send</button>
+                                <button type="submit" className="sendButton darker noBorder flexCenter"> <Send></Send> </button>
                             </form>
                         </div>
             </div>
@@ -226,8 +245,8 @@ export default Chatroom
 const Message = (props)=>{
     return <div className="arial flexColumn">
     <p className="username arial-bold" style={{
-        color: props.me?"#59b7db":"#cd4e67"
+        color: props.me?"#277ab9":"#cd4e67"
     }}>{props.username}</p>
-    <h3 className="messageText">{props.content}</h3>
+    <h3 className="messageText blackText">{props.content}</h3>
 </div>
 }

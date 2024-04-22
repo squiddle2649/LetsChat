@@ -1,6 +1,7 @@
 .homePageContainer{
     height: 100vh;
     position: relative;
+    background-color: rgb(236, 204, 196);
 }
 .signOutBtn{
     position: absolute;
@@ -11,7 +12,7 @@
     width: 300px;
     border-radius: 20px;
     border: none;
-    background-color: rgb(31, 31, 31);
+    background-color: rgb(187, 108, 108);
     color: white;
     margin: 30px;
     cursor: pointer;
