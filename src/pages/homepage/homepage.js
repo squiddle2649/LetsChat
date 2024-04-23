@@ -5,6 +5,7 @@ import {useObject} from 'react-firebase-hooks/database'
 import { useNavigate } from 'react-router-dom'
 import React, {  useState,useEffect } from 'react';
 import './homePageStyling.css'
+import LoadingScreen from 'components/loadingScreen/loadingScreen'
 
 
 const HomePage = ()=>{
@@ -131,7 +132,7 @@ const HomePage = ()=>{
 
 
     return <div className='homePageContainer flexCenter  '>
-        {(loadingLogout||loadingSnapshot||loadingUser)&&<p>loading…</p>}
+        {(loadingLogout||loadingSnapshot||loadingUser)&& <LoadingScreen></LoadingScreen> }
         {(errorUser||snapshotError)&&<p>
             Looks like something went wrong. Try refreshing the page.</p>}
         {(snapshot&&user)&&

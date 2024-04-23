@@ -6,6 +6,7 @@ import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect,useRef } from 'react';
 import './chatroomStyling.css'
 import { House,Send } from "./chatroomSVG"
+import LoadingScreen from "components/loadingScreen/loadingScreen"
 
 
 
@@ -183,7 +184,9 @@ const Chatroom = ()=>{
         
         
         
-        {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend||loadingFriendName)&&<p>loading…</p>}
+        {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend||loadingFriendName)&&
+            <LoadingScreen></LoadingScreen>
+        }
         {(friendSnapshotError||userError||!IDisRight||friendNameError)&& 
         /* friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
@@ -246,8 +249,9 @@ export default Chatroom
 const Message = (props)=>{
     return <div className="arial flexColumn">
     <p className="username arial-bold" style={{
-        color: props.me?"#277ab9":"#cd4e67"
+        color: props.me?"#277ab9":"#cd4e67",
+        marginBottom:"0"
     }}>{props.username}</p>
-    <h3 className="messageText blackText">{props.content}</h3>
+    <h3 className="messageText blackText" style={{marginTop:"0"}}>{props.content}</h3>
 </div>
 }

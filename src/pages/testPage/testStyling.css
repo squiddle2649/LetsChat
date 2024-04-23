@@ -1,7 +1,21 @@
-.messageText{
-    margin-top: 0;
+.loadingSpinner{
+  animation-name: spin;
+  animation-duration: 5000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; 
 }
-.username{
-    margin-bottom: 0;
-
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+}
+body{
+    overflow-y: hidden;
+}
+.loadingContainer{
+    width: 100vw;
+    height: 100vh;
 }

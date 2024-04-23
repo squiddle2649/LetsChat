@@ -5,6 +5,7 @@ import React, {  useState ,useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useObject } from 'react-firebase-hooks/database';
 import {useNavigate} from 'react-router-dom'
+import LoadingScreen from 'components/loadingScreen/loadingScreen';
 
 import './startPageStyling.css'
 import { GoArrow } from './startPageSVGs';
@@ -84,7 +85,8 @@ const StartPage = () =>{
     return <div className='flexCenter startPageContainer arial'>
         {(loadingUserDocument||loadingUser)?
             /* If info is still loading, show loading screen */
-        <h1 style={{color:'green'}}>loading start page</h1>:
+            <LoadingScreen></LoadingScreen>
+        :
             /* If it's no longer loading, then show normal start page */
         <form className="flexCenter" onSubmit={(e)=>{
             e.preventDefault()

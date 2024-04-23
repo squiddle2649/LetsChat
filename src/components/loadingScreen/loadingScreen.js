@@ -1,4 +1,4 @@
-import './testStyling.css'
+import './loadingScreenStyling.css'
 
 const LoadingScreen = () =>{
     return <div className='loadingContainer flexCenter'>
