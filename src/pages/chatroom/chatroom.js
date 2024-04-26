@@ -5,8 +5,9 @@ import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect,useRef } from 'react';
 import './chatroomStyling.css'
-import { House,Send,GoArrow } from "./chatroomSVG"
+import { House,Send} from "./chatroomSVG"
 import LoadingScreen from "components/loadingScreen/loadingScreen"
+import { Message } from "./messageComponent/message"
 
 
 
@@ -22,7 +23,6 @@ const Chatroom = ()=>{
     const [leftTheChat, setLeftTheChat] = useState(false)
     const existentIDs = new Set();
     
-    const newChatWarning = useRef(null)
     const chatroomRef = useRef(null)
     const messageInputRef = useRef(null)
     const scrollToBottom = (element)=>{
@@ -168,20 +168,6 @@ const Chatroom = ()=>{
         }
     }
 
-    const newChat = async()=>{
-        const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
-        try{
-            await currentConversation.remove()
-            setLeftTheChat(true)
-        }
-        catch(err){
-            alert(err.message)
-        }
-        finally{
-            newChatWarning.current.close()
-        }
-    }
-
     const generateRandomKey=(length)=> {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let result = '';
@@ -214,13 +200,6 @@ const Chatroom = ()=>{
                         You are speaking to {friendName} 
                         {(friendDisconnected)&& " (disconnected)"}
                      </h2>
-                    <button className="newChat noBorder flexCenter whiteText pointer"
-                            onClick={()=>{
-                                newChatWarning.current.showModal()
-                            }} >
-                        <h3>Find a new chat</h3>
-                        <GoArrow></GoArrow>
-                    </button>
                 </div>
                     <div ref={chatroomRef}  className="chatroom">
                         <ul className="listOfMessages" reversed>
@@ -255,14 +234,7 @@ const Chatroom = ()=>{
                                 <button type="submit" className="sendButton redBGhover pointer noBorder"> <Send></Send> </button>
                             </form>
                         </div>
-                <dialog ref={newChatWarning} className="newChatDialog">
-                    <h2>Are you sure you want to exit this chat?</h2>
-                    <button className="dialogButton noBorder pointer redBGhover whiteText" 
-                            onClick={newChat}>Yes</button>
-                    <button className="dialogButton noBorder pointer redBGhover whiteText" onClick={()=>{
-                        newChatWarning.current.close()
-                    }}>Cancel</button>
-                </dialog>
+
             </div>
              
         } 
@@ -273,12 +245,3 @@ const Chatroom = ()=>{
 }
 export default Chatroom
 
-const Message = (props)=>{
-    return <div className="arial flexColumn">
-    <p className="username arial-bold" style={{
-        color: props.me?"#277ab9":"#cd4e67",
-        marginBottom:"0"
-    }}>{props.username}</p>
-    <h3 className="messageText blackText" style={{marginTop:"0"}}>{props.content}</h3>
-</div>
-}
