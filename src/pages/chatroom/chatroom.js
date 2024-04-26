@@ -5,7 +5,7 @@ import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect,useRef } from 'react';
 import './chatroomStyling.css'
-import { House,Send } from "./chatroomSVG"
+import { House,Send,GoArrow } from "./chatroomSVG"
 import LoadingScreen from "components/loadingScreen/loadingScreen"
 
 
@@ -19,8 +19,10 @@ const Chatroom = ()=>{
     const [currentMessage, setCurrentMessage] = useState("")
     const [username, setUsername] = useState(null)    
     const [friendName, setFriendName] = useState(null)    
+    const [leftTheChat, setLeftTheChat] = useState(false)
     const existentIDs = new Set();
     
+    const newChatWarning = useRef(null)
     const chatroomRef = useRef(null)
     const messageInputRef = useRef(null)
     const scrollToBottom = (element)=>{
@@ -67,31 +69,31 @@ const Chatroom = ()=>{
         //verifying that the ID in the URL really is the friend's ID.
     },[user,friendSnapshot,usernameSnapshot])
 
-    // useEffect(()=>{
-    //     if(!user)return
-    //     const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
-    //     onDisconnect(currentConversation).remove()
+    useEffect(()=>{
+        if(!user)return
+        const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
+        onDisconnect(currentConversation).remove()
         
-    //     return ()=>{
-    //         console.log('cleaning up')
-    //     }
-    // }, []);
+        return ()=>{
+            console.log('cleaning up')
+        }
+    }, []);
 
-    // useEffect(()=>{
-    //     const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
-    //     const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
-    //         if(!snapshot.exists()){
-    //             setFriendDisconnected(true)
-    //             return
-    //         }
-    //         else{
-    //             setFriendDisconnected(false)
-    //         }
-    //     })
-    //     return()=>{
-    //         unsubscribe() 
-    //     }
-    // })
+    useEffect(()=>{
+        const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
+        const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
+            if(!snapshot.exists()){
+                setFriendDisconnected(true)
+                return
+            }
+            else{
+                setFriendDisconnected(false)
+            }
+        })
+        return()=>{
+            unsubscribe() 
+        }
+    })
 
     useEffect(()=>{ /* get data from friend's message */
         const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
@@ -164,8 +166,20 @@ const Chatroom = ()=>{
         catch(err){
             alert(err.message)
         }
-        
+    }
 
+    const newChat = async()=>{
+        const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
+        try{
+            await currentConversation.remove()
+            setLeftTheChat(true)
+        }
+        catch(err){
+            alert(err.message)
+        }
+        finally{
+            newChatWarning.current.close()
+        }
     }
 
     const generateRandomKey=(length)=> {
@@ -177,18 +191,11 @@ const Chatroom = ()=>{
         return result;
     }
     return <div className="chatroomContainer arial ">
-
-        {(friendDisconnected)&&<p>looks like your friend has disconnected</p>}
-            
-        {(friendSnapshotError)&&<p>friend disconnected?</p>}
-        
-        
-        
         {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend||loadingFriendName)&&
             <LoadingScreen></LoadingScreen>
         }
         {(friendSnapshotError||userError||!IDisRight||friendNameError)&& 
-        /* friendSnapshotError means something is wrong with the path 
+        /* the variable friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
             <section>
                 <p>looks like something went wrong.</p>
@@ -203,10 +210,19 @@ const Chatroom = ()=>{
                 <div className="chatHeader flexLeft redBG">
                     <Link to={'/chat'}> <House></House> </Link>
                     <div className="vl"></div>
-                    <h2 className="arial-bold tight whiteText" style={{marginLeft:'18px'}}>You are speaking to {friendName}</h2>
+                    <h2 className="arial-bold tight whiteText" style={{marginLeft:'18px'}}>
+                        You are speaking to {friendName} 
+                        {(friendDisconnected)&& " (disconnected)"}
+                     </h2>
+                    <button className="newChat noBorder flexCenter whiteText pointer"
+                            onClick={()=>{
+                                newChatWarning.current.showModal()
+                            }} >
+                        <h3>Find a new chat</h3>
+                        <GoArrow></GoArrow>
+                    </button>
                 </div>
                     <div ref={chatroomRef}  className="chatroom">
-                
                         <ul className="listOfMessages" reversed>
                             {messages.map((messageObject)=>(
                                 <Message
@@ -217,31 +233,42 @@ const Chatroom = ()=>{
                                     content={messageObject.content}
                                     me={messageObject.sender===user.uid}
                                 ></Message>
-                                // messageObject.sender===user.uid?
-                                // <li key={messageObject.id}><h1>{messageObject.content}</h1></li>:
-                                // <li key={messageObject.id} style={{color:"aqua"}} ><h1>{messageObject.content}</h1></li>
                             ))}
                         </ul>
                     </div>
                         <div className="formContainer flexCenter">
-                            <form className="messageForm " onSubmit={async(e)=>{
+                            <form className="messageForm redBG" onSubmit={async(e)=>{
                                 e.preventDefault()
                                 messageInputRef.current.value = ""
                                 await sendMessage(currentMessage)
 
                             }}>
-                                <input ref ={messageInputRef} className="messageInput redBG" onChange={(e)=>{
+                                <input 
+                                    ref ={messageInputRef} 
+                                    className="messageInput redBG" 
+                                    placeholder={`Message ${friendName}`}
+                                    onChange={(e)=>{
                                     setCurrentMessage(e.target.value)
-                                }}></input>
+                                }}>
+                                    
+                                </input>
                                 <button type="submit" className="sendButton redBGhover pointer noBorder"> <Send></Send> </button>
                             </form>
                         </div>
+                <dialog ref={newChatWarning} className="newChatDialog">
+                    <h2>Are you sure you want to exit this chat?</h2>
+                    <button className="dialogButton noBorder pointer redBGhover whiteText" 
+                            onClick={newChat}>Yes</button>
+                    <button className="dialogButton noBorder pointer redBGhover whiteText" onClick={()=>{
+                        newChatWarning.current.close()
+                    }}>Cancel</button>
+                </dialog>
             </div>
-            
-        
-        
+             
         } 
-
+        {(leftTheChat)&&
+            <LoadingScreen searchScreen={true}></LoadingScreen>
+        }
     </div>
 }
 export default Chatroom

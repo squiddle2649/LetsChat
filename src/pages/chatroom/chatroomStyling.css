@@ -25,6 +25,8 @@ Ahrefs’ Paragraph Generator can be utilized to quickly generate engaging and i
     margin-top: 10px;
     margin-left: 4px;
     width: 80%;
+    border-radius: 10px;
+    padding: 5px;
 }
 
 .darker{
@@ -42,11 +44,15 @@ Ahrefs’ Paragraph Generator can be utilized to quickly generate engaging and i
 .messageInput:focus{
     outline: none;
 }
+.messageInput::placeholder{
+    color: rgb(226, 198, 198);
+}
 .listOfMessages{
     display: flex;
     flex-direction: column;
 }
 .chatHeader{
+    position: relative;
     width: 80%;
     margin-bottom: 10px;
     border-radius: 15px;
@@ -57,7 +63,29 @@ Ahrefs’ Paragraph Generator can be utilized to quickly generate engaging and i
     width: 2px;
     /* background-color: #fbc5cf; */
 }
+.newChat{
+    border-radius: 15px;
+    position: absolute;
+    right: 30px;
+    padding: 0px 15px;
+    background-color: var(--darker-red);
 
+}
+
+.newChatDialog::backdrop{
+    background-color: #0000005b;
+}
+
+.newChatDialog{
+    border-radius: 15px;
+    border: none;
+    padding: 50px;
+}
+.dialogButton{
+    padding: 10px;
+    border-radius: 5px;
+    margin-right: 15px;
+}
 .sendButton{
     border-radius: 15px;
 }

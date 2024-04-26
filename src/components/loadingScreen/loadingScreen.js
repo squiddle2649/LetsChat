@@ -1,8 +1,11 @@
 import './loadingScreenStyling.css'
 
-const LoadingScreen = () =>{
+const LoadingScreen = (props) =>{
     return <div className='loadingContainer flexCenter'>
         <LoadingIcon></LoadingIcon>
+        props.searchScreen?
+        <p>Searching…</p>
+        :null
     </div>
 }
 
