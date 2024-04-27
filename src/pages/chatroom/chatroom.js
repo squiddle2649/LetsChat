@@ -7,7 +7,7 @@ import React, {  useState,useEffect,useRef,createContext } from 'react';
 import './chatroomStyling.css'
 import { House,Send} from "./chatroomSVG"
 import LoadingScreen from "components/loadingScreen/loadingScreen"
-import { MessagesList } from "./messageComponent/messagesList"
+import { MessagesList } from "./messages/messagesList"
 export const ChatroomContext = createContext()
 
 
