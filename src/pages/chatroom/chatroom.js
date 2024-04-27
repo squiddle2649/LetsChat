@@ -25,6 +25,7 @@ const Chatroom = ()=>{
     
     const chatroomRef = useRef(null)
     const messageInputRef = useRef(null)
+
     const scrollToBottom = (element)=>{
         if(user&&IDisRight)
         element.scrollTo({
@@ -207,7 +208,9 @@ const Chatroom = ()=>{
         messages:messages,
         user:user,
         friendName:friendName,
-        username:username
+        username:username,
+        friendID:friendID,
+        generateRandomKey:generateRandomKey
         /* this information has to be communicated to the MessagesList component
         through a context provider */
     }
@@ -229,6 +232,7 @@ const Chatroom = ()=>{
         {(IDisRight&&user)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
                 <button onClick={resetMessages}>reset messages</button>
+
                 <div className="chatHeader flexLeft redBG">
                     <Link to={'/chat'}> <House></House> </Link>
                     <div className="vl"></div>
@@ -261,7 +265,6 @@ const Chatroom = ()=>{
                                 <button type="submit" className="sendButton redBGhover pointer noBorder"> <Send></Send> </button>
                             </form>
                         </div>
-
             </div>
              
         } 

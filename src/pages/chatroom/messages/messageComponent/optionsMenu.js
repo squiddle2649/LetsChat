@@ -1,14 +1,18 @@
-
+import { Message, MessageContext } from './messageComponent'
+import React, {useState,useRef,useContext } from 'react';
 import './messageStyling.css'
 
 export const OptionsMenu = (props)=>{
+    const showModal = useContext(MessageContext)
     const visibility={
         display:props.visible?"":"none"
     }
     return <div className='menuContainer whiteText' style={visibility}>
-        <p className=' redBGhover menuText pointer'>Pin message</p>
-        <p className=' redBGhover menuText pointer'>Report message</p>
-        <p className=' redBGhover menuText pointer'>Add a reaction</p>
+        <div className=' redBGhover tight menuText pointer'>Pin message</div>
+        <div className=' redBGhover tight menuText pointer'
+            onClick={showModal}    
+        >Report message</div>
+        <div className=' redBGhover tight menuText pointer'>Add a reaction</div>
     </div>
 
 }

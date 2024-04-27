@@ -24,3 +24,43 @@
 .optionsSVG:hover{
     background-color: rgb(210, 210, 210);
 }
+.reportWindow{
+    position: relative;
+    border-radius: 15px;
+    border: 2px solid black;
+    padding: 40px;
+
+    width: 360px;
+    height:fit-content;
+
+}
+.closeWindowSVG{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 10px;
+    border-radius: 100%;
+    padding: 5px;
+    transition-duration: 100ms;
+}
+.closeWindowSVG:hover{
+    background-color: rgb(226, 226, 226);
+}
+.submitReport{
+    width: fit-content;
+    margin: 15px;
+    margin-left: 0;
+    padding: 10px;   
+    border-radius: 5px;
+    background-color: rgb(220, 220, 220);
+    font-size: large;
+}
+.submitReport:hover{
+    background-color: rgb(183, 183, 183);
+}
+.badMessageDisplay{
+    border: 1px solid black;
+    border-radius: 10px;
+    margin: 20px 0px;
+    padding: 10px;
+}
