@@ -1,0 +1,26 @@
+.menuContainer{
+    background-color: var(--dark-red);
+    position: absolute;
+    width: 150px;
+    top: 0;
+    left: -170px;
+    padding: 5px;
+    border-radius: 5px;
+}
+.messageOptionContainer{
+    position: relative;
+}
+.menuText{
+    margin: 0;
+    padding: 7px;
+    border-radius: 5px;
+    transition-duration: 100ms;
+}
+.optionsSVG{
+    margin-right: 10px;
+    padding: 5px;
+    border-radius: 100%;
+}
+.optionsSVG:hover{
+    background-color: rgb(210, 210, 210);
+}

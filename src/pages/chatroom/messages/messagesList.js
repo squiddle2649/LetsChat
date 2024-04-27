@@ -1,7 +1,7 @@
-import "./messageStyling.css"
+
 import { ChatroomContext } from "../chatroom";
 import React, {  useState,useEffect,useContext,createContext } from 'react';
-import { Message } from "./messageComponent";
+import { Message } from "./messageComponent/messageComponent";
 
 export const MessagesContext = createContext()
 
@@ -20,6 +20,13 @@ export const MessagesList = ()=>{
         const handleClick = (event) => {
             const clickedElement = event.target
             setSelectedMessage(clickedElement.id)
+            /* Each options menu will have an ID that is the same ID as
+            the corresponding message. Every other element in the website
+            has no ID (undefined). So if a user clicks on a menu, it will
+            open because it has the same ID as the clicked element. To close
+            the menu, you can click literally where ever because
+            it will have a different ID.
+            */
         }
         document.addEventListener('click', handleClick);
 
