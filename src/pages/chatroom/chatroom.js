@@ -3,12 +3,12 @@ import { database,auth } from "firebaseConfig/firebase"
 import { ref,set,onDisconnect,onValue,get, remove } from "firebase/database"
 import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
-import React, {  useState,useEffect,useRef } from 'react';
+import React, {  useState,useEffect,useRef,createContext } from 'react';
 import './chatroomStyling.css'
 import { House,Send} from "./chatroomSVG"
 import LoadingScreen from "components/loadingScreen/loadingScreen"
-import { Message } from "./messageComponent/message"
-
+import { MessagesList } from "./messageComponent/messagesList"
+export const ChatroomContext = createContext()
 
 
 const Chatroom = ()=>{
@@ -33,8 +33,6 @@ const Chatroom = ()=>{
         })
 
     }
-
-
     const usernameRef = 
         user?ref( database,`Users/${user.uid}/username`):null
     const [usernameSnapshot,loadingUsername,usernameError] = 
@@ -73,6 +71,8 @@ const Chatroom = ()=>{
         if(!user)return
         const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
         onDisconnect(currentConversation).remove()
+        /* remove currentConversation subcollection from the user's document
+        when he disconnects. */
         
         return ()=>{
             console.log('cleaning up')
@@ -81,8 +81,13 @@ const Chatroom = ()=>{
 
     useEffect(()=>{
         const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
+        /* we are only able to tell if the user has disconnected from the convo,
+        so we have to listen to the currentConversation subcolleciton in the friend's
+        document to make sure that it's still existent.  */
         const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
             if(!snapshot.exists()){
+                /* If it suddenly disappears, then we know that the friend
+                is disconnected and we respond accordingly. */
                 setFriendDisconnected(true)
                 return
             }
@@ -95,13 +100,22 @@ const Chatroom = ()=>{
         }
     })
 
+
     useEffect(()=>{ /* get data from friend's message */
         const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
         const unsubscribe = onValue(friendMessagesRef,(messageSnapshot)=>{
             if(!messageSnapshot.exists())return
             const messagesData = messageSnapshot.val()
+            /* format of messagesData:
+                {
+                    "l31g41yk":{content:"hi",dateCreated:123},
+                    "l31g41yk":{content:"hello",dateCreated:886},
+                }
+            */
             const messageIDs = Object.keys(messagesData)
-            
+            /* messageIDs is an array with the messages ID 
+            of the other user: messageIDs = ["l31g41yk","l31g41yk"] */
+
             const messagesArray = messageIDs.map(key => ({
                 id: key,
                 dateCreated: messagesData[key].dateCreated,
@@ -111,6 +125,11 @@ const Chatroom = ()=>{
 
             messagesArray.forEach((message)=>{
                 if(existentIDs.has(message.id))return
+                /* whenever we get the messagesArray, we get a list of all
+                the friend's messages. Some of these messages, however, are
+                already being displayed, so we add all the ids to a javascript
+                Set (which doesn't allow duplicates) and only display a message
+                if it's ID isn't already in the Set*/
                 setMessages(prevMessages => [...prevMessages,message])
                 existentIDs.add(message.id)
             }) 
@@ -124,7 +143,9 @@ const Chatroom = ()=>{
     },[])
     useEffect(()=>{
         scrollToBottom(chatroomRef.current)
+        /* whenever a new message gets added, we scroll to bottom */
     },[messages])
+
     const sendMessage = async(text)=>{
         const messageID = generateRandomKey(20)
         const userMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages/${messageID}`)
@@ -133,6 +154,9 @@ const Chatroom = ()=>{
             dateCreated:currentDate.getTime(),
             content:text
           }
+        /* this is the message document that will be added to the messages
+        collection (userMessagesRef). This doesn't have the attribute ID
+        because the document itself is an ID */
         try{
             await set(userMessagesRef,messageObject)  
             if(existentIDs.has(messageID))return
@@ -156,6 +180,8 @@ const Chatroom = ()=>{
     }
 
     const resetMessages = async()=>{
+        /* This is just for convenience: sometimes when testing the code,
+        the chatroom gets full of messages and I need to just reset everything*/
         const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
         const myMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages`)
         try{
@@ -169,6 +195,7 @@ const Chatroom = ()=>{
     }
 
     const generateRandomKey=(length)=> {
+        /* genearting a random ID for each message */
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let result = '';
         for (let i = 0; i < length; i++) {
@@ -176,6 +203,15 @@ const Chatroom = ()=>{
         }
         return result;
     }
+    const chatroomContextVal = {
+        messages:messages,
+        user:user,
+        friendName:friendName,
+        username:username
+        /* this information has to be communicated to the MessagesList component
+        through a context provider */
+    }
+
     return <div className="chatroomContainer arial ">
         {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend||loadingFriendName)&&
             <LoadingScreen></LoadingScreen>
@@ -198,22 +234,13 @@ const Chatroom = ()=>{
                     <div className="vl"></div>
                     <h2 className="arial-bold tight whiteText" style={{marginLeft:'18px'}}>
                         You are speaking to {friendName} 
-                        {(friendDisconnected)&& " (disconnected)"}
+                        {(friendDisconnected)&& " (user disconnected)"}
                      </h2>
                 </div>
                     <div ref={chatroomRef}  className="chatroom">
-                        <ul className="listOfMessages" reversed>
-                            {messages.map((messageObject)=>(
-                                <Message
-                                    username={messageObject.sender===user.uid?
-                                        username:friendName
-                                    }
-                                    key={messageObject.id}
-                                    content={messageObject.content}
-                                    me={messageObject.sender===user.uid}
-                                ></Message>
-                            ))}
-                        </ul>
+                        <ChatroomContext.Provider value={chatroomContextVal}>
+                            <MessagesList></MessagesList>
+                        </ChatroomContext.Provider>
                     </div>
                         <div className="formContainer flexCenter">
                             <form className="messageForm redBG" onSubmit={async(e)=>{
