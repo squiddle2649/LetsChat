@@ -42,14 +42,17 @@ const HomePage = ()=>{
         const userInQueueRef = ref(database,`Queue/${user.uid}`)
         try{    
             await set(userInQueueRef,{
-                username:username
+                username:"null"
+                /* we actually don't need any value here, so I just set it to null. 
+                in the future we will make it so that we just have a list of IDs in 
+                the Queue
+                */
+                
             })
             setInQueue(true)
-            
-            
         }
         catch(err){
-            alert(`An error occured while entering the queue: ${err.message}`)
+            alert(`1: An error occured while entering the queue: ${err.message}`)
         }
     }
     const exitQueue = async()=>{
@@ -60,8 +63,7 @@ const HomePage = ()=>{
             setInQueue(false)
         }
         catch(err){
-            alert(`An error occured while exiting the queue: ${err.message}`)
-
+            alert(` 2 An error occured while exiting the queue: ${err.message}`)
         }
     }
     const [snapshotQ, loadingSnapshotQ, snapshotErrorQ] = useObject(queueCollection)
@@ -113,7 +115,7 @@ const HomePage = ()=>{
             navigate(`/chat/${friendID}`)
         }
         catch(err){
-            alert(err.message)
+            alert(`3: ${err.message}`)
         }
         finally{
             await exitQueue()
@@ -131,7 +133,7 @@ const HomePage = ()=>{
     }, []);
 
 
-    return <div className='homePageContainer flexCenter  '>
+    return <div className='homePageContainer flexCenter '>
         {(loadingLogout||loadingSnapshot||loadingUser)&& <LoadingScreen></LoadingScreen> }
         {(errorUser||snapshotError)&&<p>
             Looks like something went wrong. Try refreshing the page.</p>}
@@ -159,6 +161,7 @@ const HomePage = ()=>{
             <button className='signOutBtn' onClick={async()=>{
                 await exitQueue()
                 await signOut();
+                console.log("outa here")
                 navigate('/')
             }}>sign out</button>
         </div>}

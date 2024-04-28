@@ -153,7 +153,8 @@ const Chatroom = ()=>{
         const currentDate = new Date()
         const messageObject = {
             dateCreated:currentDate.getTime(),
-            content:text
+            content:text,
+            messageRecipient:friendID
           }
         /* this is the message document that will be added to the messages
         collection (userMessagesRef). This doesn't have the attribute ID
