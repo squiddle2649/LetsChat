@@ -154,7 +154,7 @@ const Chatroom = ()=>{
         const messageObject = {
             dateCreated:currentDate.getTime(),
             content:text,
-            messageRecipient:friendID
+            // messageRecipient:friendID
           }
         /* this is the message document that will be added to the messages
         collection (userMessagesRef). This doesn't have the attribute ID
@@ -220,7 +220,7 @@ const Chatroom = ()=>{
         {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend||loadingFriendName)&&
             <LoadingScreen></LoadingScreen>
         }
-        {(friendSnapshotError||userError||!IDisRight||friendNameError)&& 
+        {((friendSnapshotError||userError||!IDisRight||friendNameError)&&!friendDisconnected)&& 
         /* the variable friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
             <section>
@@ -229,8 +229,9 @@ const Chatroom = ()=>{
                     <House></House>
                 </Link>
             </section>}
+        {friendDisconnected&& <div><p>{friendName} has disconnected</p> </div> }
 
-        {(IDisRight&&user)&&
+        {(IDisRight&&user&&!friendNameError)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
                 <button onClick={resetMessages}>reset messages</button>
 
@@ -239,7 +240,7 @@ const Chatroom = ()=>{
                     <div className="vl"></div>
                     <h2 className="arial-bold tight whiteText" style={{marginLeft:'18px'}}>
                         You are speaking to {friendName} 
-                        {(friendDisconnected)&& " (user disconnected)"}
+                        {/* {(friendDisconnected)&& " (user disconnected)"} */}
                      </h2>
                 </div>
                     <div ref={chatroomRef}  className="chatroom">
