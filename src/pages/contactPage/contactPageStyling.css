@@ -1,0 +1,10 @@
+
+.contactPageContainer{
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+.contactPage{
+    width: fit-content;
+    padding: 50px;
+}

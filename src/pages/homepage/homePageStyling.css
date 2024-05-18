@@ -38,3 +38,8 @@
     top: 30px;
     left: 30px;
 }
+.disclaimerContainer{
+    position: absolute;
+    bottom: 30px;
+    /* left: -50%; */
+}

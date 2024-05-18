@@ -8,6 +8,7 @@ import './homePageStyling.css'
 import LoadingScreen from 'components/loadingScreen/loadingScreen'
 import { SignOutArrow } from './homePageSVG'
 import { Logo } from 'components/logo/logo'
+import { Link } from 'react-router-dom'
 
 
 const HomePage = ()=>{
@@ -32,10 +33,13 @@ const HomePage = ()=>{
     }
     
     useEffect(()=>{
-        if(snapshot&&user){
-            /* snapshot.val() = {"dateCreated":1713094084929,"username":"yian"} */
-            // console.log(snapshot.val().username)
-            setUsername(snapshot.val().username)
+        if(snapshot){
+            if(!user||!snapshot.exists()){
+                navigate("/")
+            }
+            if(user){
+                setUsername(snapshot.val().username)
+            }
         }
     },[snapshot])
 
@@ -134,6 +138,9 @@ const HomePage = ()=>{
         }
     }, []);
 
+    const feedbackRequestStyle = {
+        marginBottom:'0'
+    }
 
     return <div className='homePageContainer flexCenter '>
         {(loadingLogout||loadingSnapshot||loadingUser)&& <LoadingScreen></LoadingScreen> }
@@ -174,6 +181,15 @@ const HomePage = ()=>{
             <div className='logoContainer'>
                 <Logo></Logo>
             </div>
+            <div className='disclaimerContainer flexCenter flexColumn'>
+                <Link to={"/contact"}>
+                    <h2 style={feedbackRequestStyle} class="arial">GIVE ME FEEDBACK</h2>
+                </Link>
+                <p className='disclaimer arial'>
+                    The owner of this site is not responsible for any user generated content (messages, usernames)
+                </p>
+            </div>
+
         </div>}
 
     </div>
