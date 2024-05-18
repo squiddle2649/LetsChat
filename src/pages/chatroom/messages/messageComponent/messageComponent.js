@@ -7,6 +7,7 @@ import './messageStyling.css'
 import { database } from 'firebaseConfig/firebase';
 import { ref,set } from 'firebase/database';
 import { getByDisplayValue } from '@testing-library/react';
+import { Link } from 'react-router-dom';
 
 export const MessageContext = createContext()
 
@@ -71,7 +72,10 @@ export const Message = (props)=>{
     return <div 
                 className="arial flexRow flexSpaceBetween" 
                 style={{marginTop:"8px",marginBottom:"15px"}}
-                onMouseEnter={()=>{setHoveringMessage(true)}}
+                onMouseEnter={()=>{
+                    if(props.me)return
+                    setHoveringMessage(true)
+                }}
                 onMouseLeave={()=>{
                     if(showMenu)return
                     setHoveringMessage(false)
@@ -96,6 +100,7 @@ export const Message = (props)=>{
                     <div className='flexCenter flexColumn'>
                         <h2>Your report was submitted</h2>
                         <CheckBoxSVG></CheckBoxSVG>
+                        <h3>Would you like to return <Link to="/chat">home?</Link></h3>
                     </div>
                 }
                 {!reportWasFiled&&

@@ -64,3 +64,37 @@
     margin: 20px 0px;
     padding: 10px;
 }
+.testContainer{
+    background-color: var(--dark-red);
+    width: 150px;
+    padding: 5px;
+    border-radius: 5px;
+    position: absolute;
+    left:400px;
+    top:400px;
+}
+.menuText{
+    margin: 0;
+    padding: 7px;
+    border-radius: 5px;
+    transition-duration: 100ms;
+    position:relative;
+}
+.reactionsBox{
+    background-color: var(--dark-red);
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: fit-content;
+    border-radius: 5px;
+    display: grid;
+    /* grid-template-columns: repeat(4,1fr); */
+    padding: 0px 10px;
+}
+.emoji{
+    margin: 10px;
+    padding: 0 2px;
+    border-radius: 5px;
+    height: fit-content;
+    width: fit-content;
+}

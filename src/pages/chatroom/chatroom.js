@@ -13,13 +13,13 @@ export const ChatroomContext = createContext()
 
 const Chatroom = ()=>{
     const {friendID} = useParams()
-    const [IDisRight, setIDisRight] = useState(`loading`)
+    const [IDisRight, setIDisRight] = useState(true)
     const [user,loadingUser,userError] = useAuthState(auth)
     const [messages,setMessages] = useState([])
     const [friendDisconnected,setFriendDisconnected] = useState(false)
     const [currentMessage, setCurrentMessage] = useState("")
-    const [username, setUsername] = useState(null)    
-    const [friendName, setFriendName] = useState(null)    
+    const [username, setUsername] = useState("louis")    
+    const [friendName, setFriendName] = useState("thomas")    
     const [leftTheChat, setLeftTheChat] = useState(false)
     const existentIDs = new Set();
     
@@ -217,24 +217,25 @@ const Chatroom = ()=>{
     }
 
     return <div className="chatroomContainer arial ">
-        {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend||loadingFriendName)&&
+        {/* {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend||loadingFriendName)&&
             <LoadingScreen></LoadingScreen>
-        }
+        } */}
         {((friendSnapshotError||userError||!IDisRight||friendNameError)&&!friendDisconnected)&& 
         /* the variable friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
-            <section>
-                <p>looks like something went wrong.</p>
-                <Link to={'/chat'}>
-                    <House></House>
-                </Link>
-            </section>}
+        <div className='arial flexCenter flexColumn errorPageContainer'>
+        <div class="flexCenter" >
+            <h1 style={{marginBottom:"0"}}>🙃</h1>
+            <h2 style={{marginBottom:"0"}}>Whoops</h2>
+        </div>
+        <h3>Looks like the person you are talking to has disconnected</h3>
+        <Link to={"/chat"}>Return home</Link>
+    </div>
+        }
         {friendDisconnected&& <div><p>{friendName} has disconnected</p> </div> }
 
         {(IDisRight&&user&&!friendNameError)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
-                <button onClick={resetMessages}>reset messages</button>
-
                 <div className="chatHeader flexLeft redBG">
                     <Link to={'/chat'}> <House></House> </Link>
                     <div className="vl"></div>
@@ -252,7 +253,9 @@ const Chatroom = ()=>{
                             <form className="messageForm redBG" onSubmit={async(e)=>{
                                 e.preventDefault()
                                 messageInputRef.current.value = ""
+                                if(currentMessage==="")return
                                 await sendMessage(currentMessage)
+                                setCurrentMessage("")
 
                             }}>
                                 <input 

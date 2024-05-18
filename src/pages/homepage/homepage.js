@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import React, {  useState,useEffect } from 'react';
 import './homePageStyling.css'
 import LoadingScreen from 'components/loadingScreen/loadingScreen'
+import { SignOutArrow } from './homePageSVG'
+import { Logo } from 'components/logo/logo'
 
 
 const HomePage = ()=>{
@@ -140,7 +142,7 @@ const HomePage = ()=>{
         {(snapshot&&user)&&
         <div className='flexColumn flexCenter'>
             <h1 className='arial-bold-italic tight welcomeText'>Welcome, {username}</h1>
-
+    
             {/* 1. If user is in the queue, he will be given an option to exit it.
                 2. if he is not in the queue, he will be given an option to enter */}
             {inQueue?
@@ -158,12 +160,20 @@ const HomePage = ()=>{
             </div>
             }
             
-            <button className='signOutBtn' onClick={async()=>{
-                await exitQueue()
-                await signOut();
-                console.log("outa here")
-                navigate('/')
-            }}>sign out</button>
+            <div className='signOutContainer flexCenter'>
+                <button className='signOutButton flexCenter' onClick={async()=>{
+                    await exitQueue()
+                    await signOut();
+                    console.log("outa here")
+                    navigate('/')
+                }}>
+                    <SignOutArrow></SignOutArrow>
+                </button>
+                <h3 className='arial'>Sign out</h3>
+            </div>
+            <div className='logoContainer'>
+                <Logo></Logo>
+            </div>
         </div>}
 
     </div>

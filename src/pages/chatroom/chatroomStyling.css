@@ -13,9 +13,6 @@
     word-break: break-word;
     border-radius: 15px;
 }
-/* 
-Ahrefs’ Paragraph Generator can be utilized to quickly generate engaging and informative paragraphs for various types of content. Whether it's blog posts, articles, product descriptions, or social media captions, the tool can assist in generating compelling paragraphs, saving time and effort for content creators.
-*/
 .formContainer{
     width: 100%;
 }
@@ -71,7 +68,10 @@ Ahrefs’ Paragraph Generator can be utilized to quickly generate engaging and i
     background-color: var(--darker-red);
 
 }
-
+.errorPageContainer{
+    height: 100vh;
+    overflow: hidden;
+}
 
 .sendButton{
     border-radius: 15px;
