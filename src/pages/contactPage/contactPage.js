@@ -4,13 +4,11 @@ import { Logo } from 'components/logo/logo'
 import { Link } from 'react-router-dom'
     
 const ContactPage = () =>{
-
-
-    return <div>
-        <Link to="/">
+    return <div style={{padding:"10px"}}>
+        <Link to="/" className='logoLinkContainer'>
             <Logo></Logo>
         </Link>
-        <div className="contactPageContainer flexStart">
+        <div className="contactPageContainer flexCenter">
             <div className="contactPage">
                 <h1 className='arial-bold'>Contact me</h1>
                 <ContactInfo
@@ -30,7 +28,7 @@ const ContactPage = () =>{
 const ContactInfo = (props)=>{
     return <div className='contactInfo flexAlignCenter'>
         <div>{props.icon}</div>
-        <h3 style={{marginLeft:"10px"}}>{props.text}</h3>
+        <h2 className='arial' style={{marginLeft:"10px"}}>{props.text}</h2>
     </div>  
 }
 

@@ -70,7 +70,6 @@
 }
 .errorPageContainer{
     height: 100vh;
-    overflow: hidden;
 }
 
 .sendButton{

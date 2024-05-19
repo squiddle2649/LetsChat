@@ -1,10 +1,11 @@
 import { useParams,Link } from "react-router-dom"
 import { database,auth } from "firebaseConfig/firebase"
-import { ref,set,onDisconnect,onValue,get, remove } from "firebase/database"
+import { ref, set,onDisconnect,onValue,get, remove,update } from "firebase/database"
 import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect,useRef,createContext } from 'react';
-import './chatroomStyling.css'
+import './chatroomStyling.css?'
+import 'components/generalStyling/main.css'
 import { House,Send} from "./chatroomSVG"
 import LoadingScreen from "components/loadingScreen/loadingScreen"
 import { MessagesList } from "./messages/messagesList"
@@ -16,11 +17,11 @@ const Chatroom = ()=>{
     const [IDisRight, setIDisRight] = useState(true)
     const [user,loadingUser,userError] = useAuthState(auth)
     const [messages,setMessages] = useState([])
-    const [friendDisconnected,setFriendDisconnected] = useState(false)
     const [currentMessage, setCurrentMessage] = useState("")
     const [username, setUsername] = useState("louis")    
     const [friendName, setFriendName] = useState("thomas")    
-    const [leftTheChat, setLeftTheChat] = useState(false)
+    const [friendOffline, setFriendOffline] = useState(false)
+
     const existentIDs = new Set();
     
     const chatroomRef = useRef(null)
@@ -57,6 +58,15 @@ const Chatroom = ()=>{
         setFriendName(friendNameSnap.val())
     },[IDisRight,friendNameSnap])
 
+    const setOnline = async(ref)=>{
+        try{
+            await update(ref,{userOffline:false})
+        }
+        catch(err){
+            alert(err.message)
+        }
+    }
+
     useEffect(()=>{
         if(!user||!friendSnapshot||!usernameSnapshot)return
         /* If the user or the friendsnapshot isn't ready, then just return */
@@ -64,14 +74,20 @@ const Chatroom = ()=>{
         user's own CurrentConversation collection */
         setUsername(usernameSnapshot.val())
         setIDisRight(friendSnapshot.val()===friendID)
+        const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
+        if(IDisRight){
+            setOnline(currentConversation)
+        }
 
         //verifying that the ID in the URL really is the friend's ID.
     },[user,friendSnapshot,usernameSnapshot])
 
+    
+
     useEffect(()=>{
         if(!user)return
         const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
-        onDisconnect(currentConversation).remove()
+        onDisconnect(currentConversation).update({userOffline:true})
         /* remove currentConversation subcollection from the user's document
         when he disconnects. */
         
@@ -80,27 +96,45 @@ const Chatroom = ()=>{
         }
     }, []);
 
-    useEffect(()=>{
-        const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
-        /* we are only able to tell if the user has disconnected from the convo,
-        so we have to listen to the currentConversation subcolleciton in the friend's
-        document to make sure that it's still existent.  */
-        const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
-            if(!snapshot.exists()){
-                /* If it suddenly disappears, then we know that the friend
-                is disconnected and we respond accordingly. */
-                setFriendDisconnected(true)
-                return
-            }
-            else{
-                setFriendDisconnected(false)
-            }
-        })
-        return()=>{
-            unsubscribe() 
-        }
-    })
 
+
+    // useEffect(()=>{
+    //     const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
+    //     /* we are only able to tell if the user has disconnected from the convo,
+    //     so we have to listen to the currentConversation subcolleciton in the friend's
+    //     document to make sure that it's still existent.  */
+    //     const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
+    //         if(!snapshot.exists()){
+    //             /* If it suddenly disappears, then we know that the friend
+    //             is disconnected and we respond accordingly. */
+    //             setFriendDisconnected(true)
+    //             return
+    //         }
+    //         else{
+    //             setFriendDisconnected(false)
+    //         }
+    //     })
+    //     return()=>{
+    //         unsubscribe() 
+    //     }
+    // },[])
+
+
+    useEffect(()=>{
+        if(!IDisRight)return
+        const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
+
+        const unsubscribe = ()=>{
+            onValue(friendConvoRef,(snapshot)=>{
+                const friendIsOffline = snapshot.val()["userOffline"]
+                setFriendOffline(friendIsOffline)
+
+            })
+        }
+        return ()=>{
+            unsubscribe()    
+        }
+    },[])
 
     useEffect(()=>{ /* get data from friend's message */
         const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
@@ -181,6 +215,8 @@ const Chatroom = ()=>{
 
     }
 
+    
+
     const resetMessages = async()=>{
         /* This is just for convenience: sometimes when testing the code,
         the chatroom gets full of messages and I need to just reset everything*/
@@ -216,11 +252,18 @@ const Chatroom = ()=>{
         through a context provider */
     }
 
+    const errorCheck = ()=>{
+        console.log(`friendsnapshot error: ${friendSnapshotError}`)
+        console.log(`id correct?: ${IDisRight}`)
+        console.log(`userError: ${userError}`)
+        console.log(`friend name erro: ${friendNameError}`)
+    }
+
     return <div className="chatroomContainer arial ">
-        {/* {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend||loadingFriendName)&&
+        {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend||loadingFriendName)&&
             <LoadingScreen></LoadingScreen>
-        } */}
-        {((friendSnapshotError||userError||!IDisRight||friendNameError)&&!friendDisconnected)&& 
+        }
+        {((friendSnapshotError||userError||!IDisRight||friendNameError))&& 
         /* the variable friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
         <div className='arial flexCenter flexColumn errorPageContainer'>
@@ -228,11 +271,11 @@ const Chatroom = ()=>{
             <h1 style={{marginBottom:"0"}}>🙃</h1>
             <h2 style={{marginBottom:"0"}}>Whoops</h2>
         </div>
-        <h3>Looks like the person you are talking to has disconnected</h3>
-        <Link to={"/chat"}>Return home</Link>
+        <h3>It looks like something's gone wrong…</h3>
+        <Link to={"/chat"}>Take me home</Link>
     </div>
         }
-        {friendDisconnected&& <div><p>{friendName} has disconnected</p> </div> }
+        
 
         {(IDisRight&&user&&!friendNameError)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
@@ -241,7 +284,7 @@ const Chatroom = ()=>{
                     <div className="vl"></div>
                     <h2 className="arial-bold tight whiteText" style={{marginLeft:'18px'}}>
                         You are speaking to {friendName} 
-                        {/* {(friendDisconnected)&& " (user disconnected)"} */}
+                        {friendOffline&& " (user disconnected)"}
                      </h2>
                 </div>
                     <div ref={chatroomRef}  className="chatroom">
@@ -273,9 +316,6 @@ const Chatroom = ()=>{
             </div>
              
         } 
-        {(leftTheChat)&&
-            <LoadingScreen searchScreen={true}></LoadingScreen>
-        }
     </div>
 }
 export default Chatroom

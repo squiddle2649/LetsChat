@@ -5,10 +5,12 @@ import {useObject} from 'react-firebase-hooks/database'
 import { useNavigate } from 'react-router-dom'
 import React, {  useState,useEffect } from 'react';
 import './homePageStyling.css'
+import 'components/generalStyling/main.css'
 import LoadingScreen from 'components/loadingScreen/loadingScreen'
 import { SignOutArrow } from './homePageSVG'
 import { Logo } from 'components/logo/logo'
 import { Link } from 'react-router-dom'
+
 
 
 const HomePage = ()=>{
@@ -33,13 +35,10 @@ const HomePage = ()=>{
     }
     
     useEffect(()=>{
-        if(snapshot){
-            if(!user||!snapshot.exists()){
-                navigate("/")
-            }
-            if(user){
-                setUsername(snapshot.val().username)
-            }
+        if(snapshot&&user){
+            /* snapshot.val() = {"dateCreated":1713094084929,"username":"yian"} */
+            // console.log(snapshot.val().username)
+            setUsername(snapshot.val().username)
         }
     },[snapshot])
 
@@ -147,8 +146,8 @@ const HomePage = ()=>{
         {(errorUser||snapshotError)&&<p>
             Looks like something went wrong. Try refreshing the page.</p>}
         {(snapshot&&user)&&
-        <div className='flexColumn flexCenter'>
-            <h1 className='arial-bold-italic tight welcomeText'>Welcome, {username}</h1>
+        <div className='flexColumn flexCenter classy'>
+            <h1 className='arial-bold-italic welcomeText'>Welcome, {username}</h1>
     
             {/* 1. If user is in the queue, he will be given an option to exit it.
                 2. if he is not in the queue, he will be given an option to enter */}
