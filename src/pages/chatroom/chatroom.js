@@ -278,16 +278,17 @@ const Chatroom = ()=>{
         {(IDisRight===`loading`||loadingUser||loadingUsername||loadingSnapshotFriend||loadingFriendName)&&
             <LoadingScreen></LoadingScreen>
         }
-        {((friendSnapshotError||userError||!IDisRight||friendNameError||usernameError))&& 
+        {((friendSnapshotError||userError||!IDisRight||friendNameError||usernameError)&&!friendName)&& 
         /* the variable friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
         <div className='arial flexCenter flexColumn errorPageContainer'>
-        <div class="flexCenter" >
+        <div className="flexCenter" >
             <h1 style={{marginBottom:"0"}}>🙃</h1>
             <h2 style={{marginBottom:"0"}}>Whoops</h2>
         </div>
         <h3>It looks like something's gone wrong…</h3>
         <Link to={"/chat"}>Take me home</Link>
+        <button onClick={errorCheck}>Check error</button>
     </div>
         }
         
@@ -297,7 +298,7 @@ const Chatroom = ()=>{
                 <div className="chatHeader flexLeft redBG">
                     <Link to={'/chat'}> <House></House> </Link>
                     <div className="vl"></div>
-                    <h2 className="arial-bold tight whiteText" style={{marginLeft:'18px'}}>
+                    <h2 className=" whiteText" style={{marginLeft:'18px'}}>
                         You are speaking to {friendName} 
                         {friendOffline&& " (user disconnected)"}
                      </h2>

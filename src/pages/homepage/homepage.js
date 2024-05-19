@@ -131,9 +131,10 @@ const HomePage = ()=>{
         if(!user)return
         const userInQueueRef = ref(database,`Queue/${user.uid}`)
         onDisconnect(userInQueueRef).remove()
-
+        
         return ()=>{
-            console.log('cleaning up')
+
+            onDisconnect(userInQueueRef).cancel()
         }
     }, []);
 
@@ -145,6 +146,14 @@ const HomePage = ()=>{
         {(loadingLogout||loadingSnapshot||loadingUser)&& <LoadingScreen></LoadingScreen> }
         {(errorUser||snapshotError)&&<p>
             Looks like something went wrong. Try refreshing the page.</p>}
+        {(!user||!snapshot)&& 
+            <section className='flexCenter flexColumn arial'>
+                <h2 className='arial-bold'>Looks like you're not signed in</h2>
+                <Link to="/">
+                    <h3>Return to start page</h3>
+                </Link>
+            </section>
+        }
         {(snapshot&&user)&&
         <div className='flexColumn flexCenter classy'>
             <h1 className='arial-bold-italic welcomeText'>Welcome, {username}</h1>
@@ -182,7 +191,7 @@ const HomePage = ()=>{
             </div>
             <div className='disclaimerContainer flexCenter flexColumn'>
                 <Link to={"/contact"}>
-                    <h2 style={feedbackRequestStyle} class="arial">GIVE ME FEEDBACK</h2>
+                    <h2 style={feedbackRequestStyle} className="arial">GIVE ME FEEDBACK</h2>
                 </Link>
                 <p className='disclaimer arial'>
                     The owner of this site is not responsible for any user generated content (messages, usernames)

@@ -92,7 +92,7 @@ const StartPage = () =>{
             e.preventDefault()
             signIn()
         }}>
-            <label><h1 className='arial-bold '>👋 Hi, my name is </h1></label>
+            <label><h1 className='arial-bold'>👋 Hi, my name is </h1></label>
             <input className='nameInput' required type="text"  onChange={(e)=>{
                 setUsername(e.target.value)
             }}></input>    

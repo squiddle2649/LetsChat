@@ -13,7 +13,7 @@ const ContactPage = () =>{
                 <h1 className='arial-bold'>Contact me</h1>
                 <ContactInfo
                     icon ={<MailIcon></MailIcon>}
-                    text ="bruno.abj2017@gmail.com"
+                    text ="dxr25533@gmail.com"
                 ></ContactInfo>
                 <ContactInfo
                     icon ={<PhoneIcon></PhoneIcon>}

@@ -10,6 +10,7 @@
     border-top: none;
     border-bottom: 2px solid black;
     font-size:30px;
+    border-radius: 0%;
 }
 .nameInput:focus{
     outline:none;

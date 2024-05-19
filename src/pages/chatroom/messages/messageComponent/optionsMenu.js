@@ -26,7 +26,7 @@ export const OptionsMenu = (props)=>{
     return <div className='menuContainer whiteText' style={visibility}>
         {/* <div className=' redBGhover tight menuText pointer'>Pin message</div> */}
         <div 
-            className=' redBGhover tight menuText pointer'
+            className=' redBGhover menuText pointer'
             onClick={showModal}    
         >Report message</div>
         {/* <div 
