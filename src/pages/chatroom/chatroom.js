@@ -68,6 +68,19 @@ const Chatroom = ()=>{
     }
 
     useEffect(()=>{
+        if(!user)return
+
+        const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
+        onDisconnect(currentConversation).update({userOffline:true})
+        /* remove currentConversation subcollection from the user's document
+        when he disconnects. */
+        
+        return ()=>{
+            console.log('cleaning up')
+        }
+    }, [user]);
+
+    useEffect(()=>{
         if(!user||!friendSnapshot||!usernameSnapshot)return
         /* If the user or the friendsnapshot isn't ready, then just return */
         /* REMEMBER: FriendSnapshot is the ID of the friend written in the
@@ -82,59 +95,49 @@ const Chatroom = ()=>{
         //verifying that the ID in the URL really is the friend's ID.
     },[user,friendSnapshot,usernameSnapshot])
 
-    
-
-    useEffect(()=>{
-        if(!user)return
-        const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
-        onDisconnect(currentConversation).update({userOffline:true})
-        /* remove currentConversation subcollection from the user's document
-        when he disconnects. */
-        
-        return ()=>{
-            console.log('cleaning up')
-        }
-    }, []);
-
-
-
-    // useEffect(()=>{
-    //     const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
-    //     /* we are only able to tell if the user has disconnected from the convo,
-    //     so we have to listen to the currentConversation subcolleciton in the friend's
-    //     document to make sure that it's still existent.  */
-    //     const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
-    //         if(!snapshot.exists()){
-    //             /* If it suddenly disappears, then we know that the friend
-    //             is disconnected and we respond accordingly. */
-    //             setFriendDisconnected(true)
-    //             return
-    //         }
-    //         else{
-    //             setFriendDisconnected(false)
-    //         }
-    //     })
-    //     return()=>{
-    //         unsubscribe() 
-    //     }
-    // },[])
-
 
     useEffect(()=>{
         if(!IDisRight)return
         const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
 
-        const unsubscribe = ()=>{
-            onValue(friendConvoRef,(snapshot)=>{
-                const friendIsOffline = snapshot.val()["userOffline"]
-                setFriendOffline(friendIsOffline)
+        const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
+            const friendIsOffline = snapshot.val()["userOffline"]
+            setFriendOffline(friendIsOffline)
 
-            })
-        }
+        })
+        
         return ()=>{
             unsubscribe()    
         }
     },[])
+
+    useEffect(()=>{
+        if(!user)return
+        const userMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages`)
+        const unsubscribe=onValue(userMessagesRef,(messageSnapshot)=>{
+            if(!messageSnapshot.exists())return
+            const messagesData = messageSnapshot.val()
+            const messageIDs = Object.keys(messagesData)
+
+            const messagesArray = messageIDs.map(key => ({
+                id: key,
+                dateCreated: messagesData[key].dateCreated,
+                content: messagesData[key].content,
+                sender:user.uid
+            }));
+            
+            messagesArray.forEach((message)=>{
+                if(existentIDs.has(message.id))return
+                setMessages(prevMessages => [...prevMessages,message])
+                existentIDs.add(message.id)
+            }) 
+
+        
+        })
+        return()=>{
+            unsubscribe()
+        }
+    },[user])
 
     useEffect(()=>{ /* get data from friend's message */
         const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
@@ -151,12 +154,22 @@ const Chatroom = ()=>{
             /* messageIDs is an array with the messages ID 
             of the other user: messageIDs = ["l31g41yk","l31g41yk"] */
 
+            /* 
+                I have the following array in javascript:
+                [
+                    {id:'elfisu',dateCreated:12},
+                    {id:'almina',dateCreated:21},
+                    {id:'liuse',dateCreated:2}
+                ]
+            */
             const messagesArray = messageIDs.map(key => ({
                 id: key,
                 dateCreated: messagesData[key].dateCreated,
                 content: messagesData[key].content,
                 sender:friendID
               }));
+
+
 
             messagesArray.forEach((message)=>{
                 if(existentIDs.has(message.id))return
@@ -176,8 +189,10 @@ const Chatroom = ()=>{
         
 
     },[])
+
     useEffect(()=>{
         scrollToBottom(chatroomRef.current)
+        messages.sort((a, b) => a.dateCreated - b.dateCreated);
         /* whenever a new message gets added, we scroll to bottom */
     },[messages])
 
@@ -195,14 +210,14 @@ const Chatroom = ()=>{
         because the document itself is an ID */
         try{
             await set(userMessagesRef,messageObject)  
-            if(existentIDs.has(messageID))return
-            setMessages(prevMessages=>[...prevMessages,{
-                id:messageID,
-                dateCreated:currentDate.getTime(),
-                content:text,
-                sender:user.uid,
-                }]);
-            existentIDs.add(messageID)
+            // if(existentIDs.has(messageID))return
+            // setMessages(prevMessages=>[...prevMessages,{
+            //     id:messageID,
+            //     dateCreated:currentDate.getTime(),
+            //     content:text,
+            //     sender:user.uid,
+            //     }]);
+            // existentIDs.add(messageID)
 
 
         }
@@ -260,10 +275,10 @@ const Chatroom = ()=>{
     }
 
     return <div className="chatroomContainer arial ">
-        {(IDisRight===`loading`||loadingUser||loadingSnapshotFriend||loadingFriendName)&&
+        {(IDisRight===`loading`||loadingUser||loadingUsername||loadingSnapshotFriend||loadingFriendName)&&
             <LoadingScreen></LoadingScreen>
         }
-        {((friendSnapshotError||userError||!IDisRight||friendNameError))&& 
+        {((friendSnapshotError||userError||!IDisRight||friendNameError||usernameError))&& 
         /* the variable friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
         <div className='arial flexCenter flexColumn errorPageContainer'>
