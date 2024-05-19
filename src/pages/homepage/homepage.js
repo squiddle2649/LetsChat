@@ -25,6 +25,7 @@ const HomePage = ()=>{
     const [match,setMatch]=useState(null)
     const [inQueue, setInQueue] = useState(false)
     
+    const [nogo, setNogo]=useState(false)
 
     const queueCollection = ref(database,"Queue")
 
@@ -39,6 +40,10 @@ const HomePage = ()=>{
             /* snapshot.val() = {"dateCreated":1713094084929,"username":"yian"} */
             // console.log(snapshot.val().username)
             setUsername(snapshot.val().username)
+            setNogo(false)
+        }
+        else{
+            setNogo(true)
         }
     },[snapshot])
 
@@ -146,7 +151,7 @@ const HomePage = ()=>{
         {(loadingLogout||loadingSnapshot||loadingUser)&& <LoadingScreen></LoadingScreen> }
         {(errorUser||snapshotError)&&<p>
             Looks like something went wrong. Try refreshing the page.</p>}
-        {(!user||!snapshot)&& 
+        {nogo&& 
             <section className='flexCenter flexColumn arial'>
                 <h2 className='arial-bold'>Looks like you're not signed in</h2>
                 <Link to="/">
@@ -175,20 +180,11 @@ const HomePage = ()=>{
             </div>
             }
             
-            <div className='signOutContainer flexCenter'>
-                <button className='signOutButton flexCenter' onClick={async()=>{
-                    await exitQueue()
-                    await signOut();
-                    console.log("outa here")
-                    navigate('/')
-                }}>
-                    <SignOutArrow></SignOutArrow>
-                </button>
-                <h3 className='arial'>Sign out</h3>
-            </div>
-            <div className='logoContainer'>
-                <Logo></Logo>
-            </div>
+            <Header 
+                exitQueue={exitQueue}
+                signOut={signOut}
+                navigate={navigate}
+            ></Header>
             <div className='disclaimerContainer flexCenter flexColumn'>
                 <Link to={"/contact"}>
                     <h2 style={feedbackRequestStyle} className="arial">GIVE ME FEEDBACK</h2>
@@ -200,6 +196,26 @@ const HomePage = ()=>{
 
         </div>}
 
+    </div>
+}
+const Header = (props)=>{
+
+    return <div className='headerContainer'>
+        <div className='logoContainer'>
+                <Logo></Logo>
+            </div>
+        <div className='signOutContainer flexCenter'>
+            <button className='signOutButton flexCenter' 
+                onClick={()=>{
+                props.exitQueue()
+                props.signOut();
+                console.log("outa here")
+                props.navigate('/')
+            }}>
+                <SignOutArrow></SignOutArrow>
+            </button>
+            <h3 className='arial'>Sign out</h3>
+        </div>
     </div>
 }
 export default HomePage

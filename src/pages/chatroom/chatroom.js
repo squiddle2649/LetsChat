@@ -278,7 +278,7 @@ const Chatroom = ()=>{
         {(IDisRight===`loading`||loadingUser||loadingUsername||loadingSnapshotFriend||loadingFriendName)&&
             <LoadingScreen></LoadingScreen>
         }
-        {((friendSnapshotError||userError||!IDisRight||friendNameError||usernameError)&&!friendName)&& 
+        {((friendSnapshotError||userError||!IDisRight||friendNameError||usernameError)/* &&!friendName */)&& 
         /* the variable friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
         <div className='arial flexCenter flexColumn errorPageContainer'>
@@ -288,7 +288,7 @@ const Chatroom = ()=>{
         </div>
         <h3>It looks like something's gone wrong…</h3>
         <Link to={"/chat"}>Take me home</Link>
-        <button onClick={errorCheck}>Check error</button>
+        {/* <button onClick={errorCheck}>Check error</button> */}
     </div>
         }
         

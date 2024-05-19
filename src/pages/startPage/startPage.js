@@ -88,14 +88,16 @@ const StartPage = () =>{
             <LoadingScreen></LoadingScreen>
         :
             /* If it's no longer loading, then show normal start page */
-        <form className="flexCenter" onSubmit={(e)=>{
+        <form className="flexCenter enterForm" onSubmit={(e)=>{
             e.preventDefault()
             signIn()
         }}>
-            <label><h1 className='arial-bold'>👋 Hi, my name is </h1></label>
-            <input className='nameInput' required type="text"  onChange={(e)=>{
-                setUsername(e.target.value)
-            }}></input>    
+            <div className='formComponents'>
+                <label><h1 className='tight arial-bold'>👋 Hi, my name is </h1></label>
+                <input className='nameInput' required type="text"  onChange={(e)=>{
+                    setUsername(e.target.value)
+                }}></input>
+            </div>
             <button className='enterButton flexCenter' type='submit'><GoArrow></GoArrow></button>
         </form> }
         

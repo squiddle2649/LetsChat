@@ -46,6 +46,9 @@
 .arial-bold{
     font-family: arial-bold;
 }
+.bold{
+    font-weight: 900;
+}
 .arial-italic{
     font-family: arial-italic;
 }

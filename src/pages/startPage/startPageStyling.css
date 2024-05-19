@@ -26,3 +26,21 @@
 .enterButton:hover{
     background-color: rgb(212, 212, 212);
 }
+.formComponents{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+@media (max-width: 650px){
+    .formComponents{
+        flex-direction: column;
+    }
+}
+@media (max-width: 450px){
+    .enterForm{
+        flex-direction: column;
+    }
+    .enterButton{
+        margin-top: 50px;
+    }
+}
