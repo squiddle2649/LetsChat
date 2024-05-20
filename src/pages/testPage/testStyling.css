@@ -1,24 +1,22 @@
-.testContainer{
+.testMenuContainer{
     background-color: var(--dark-red);
     width: 150px;
     padding: 5px;
     border-radius: 5px;
-    position: absolute;
-    left:400px;
-    top:400px;
+    position: relative;
 }
-.testText{
+.testMenuText{
     margin: 0;
     padding: 7px;
     border-radius: 5px;
     transition-duration: 100ms;
-    position:relative;
 }
-.reactionsBox{
+
+.emojisContainer{
     background-color: var(--dark-red);
     position: absolute;
     top: 0;
-    left: 110%;
+    right: 105%;
     width: fit-content;
     border-radius: 5px;
     display: grid;
@@ -26,7 +24,8 @@
     padding: 0px 10px;
 }
 .emoji{
-    margin: 8px;
+    margin: 10px;
+    padding: 0 2px;
     border-radius: 5px;
     height: fit-content;
     width: fit-content;

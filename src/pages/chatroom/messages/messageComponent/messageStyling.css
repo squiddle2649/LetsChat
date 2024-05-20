@@ -80,16 +80,20 @@
     transition-duration: 100ms;
     position:relative;
 }
-.reactionsBox{
+.reactionOption{
+    position: relative;
+}
+.emojisContainer{
     background-color: var(--dark-red);
     position: absolute;
     top: 0;
-    right: 0;
+    right: 100%;
     width: fit-content;
     border-radius: 5px;
     display: grid;
-    /* grid-template-columns: repeat(4,1fr); */
+    grid-template-columns: repeat(4,1fr);
     padding: 0px 10px;
+    z-index: 2;
 }
 .emoji{
     margin: 10px;
@@ -97,4 +101,5 @@
     border-radius: 5px;
     height: fit-content;
     width: fit-content;
+    /* color: rgba(166, 59, 223, 0.488); */
 }

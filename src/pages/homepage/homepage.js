@@ -169,7 +169,7 @@ const HomePage = ()=>{
                 2. if he is not in the queue, he will be given an option to enter */}
             {inQueue?
             <div className='flexColumn flexCenter'>
-                <p className='arial searchingText'>Searching…</p>
+                <p className='arial searchingText'>Finding someone for you…</p>
                 <button className ="startChatBtn redBGhover noBorder pointer whiteText " onClick={exitQueue}>
                     <h2 className="arial">Cancel</h2>
                 </button>

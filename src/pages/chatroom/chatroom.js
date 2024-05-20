@@ -273,6 +273,7 @@ const Chatroom = ()=>{
         
         {(IDisRight&&user&&!friendNameError)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
+                {/* <button onClick={resetMessages}>Reset messages</button> */}
                 <div className="chatHeader flexLeft redBG">
                     <Link to={'/chat'}> <House></House> </Link>
                     <div className="vl"></div>

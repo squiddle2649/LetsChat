@@ -1,54 +1,58 @@
-import React, { useEffect,useState } from 'react';
-import { database,auth } from "firebaseConfig/firebase"
-
-import { ref, set,onDisconnect,onValue,get, remove,update } from "firebase/database"
-
+import './testStyling.css'
+import React, {useState,useEffect,useContext } from 'react';
+import { useAuthState } from "react-firebase-hooks/auth"
+import { ref,get,update} from 'firebase/database';
+import { database,auth } from 'firebaseConfig/firebase';
 
 const  TestPage = () => {
-    const userId = "hKSqdsAIhTOPasn37sULE9bBDjZ2"
-    const [isOnline, setIsOnline] = useState(false);
+    const [messageContent,setMessageContent] = useState("")
+    const userID = "9X8oqSDo3Je1iZhmuxYa2Cwnz3H3"
+    const friendID = "YzV6dl6VsdY2AACYadwJQXcHRuk2"
+    const [user,loadingUser,userError] = useAuthState(auth)
 
-    useEffect(() => {
-        
-        const userStatusDatabaseRef = ref(database,`/status/${userId}`);
-        
-        const isOfflineForDatabase = {
-            state: 'offline',
-            // last_changed:.ServerValue.TIMESTAMP,
-        };
+    const messageRef = ref(database,`Users/${friendID}/CurrentConversation/Messages/eTfgqKBTf7WBVzYO4YZH`)
 
-        const isOnlineForDatabase = {
-            state: 'online',
-            // last_changed: firebase.database.ServerValue.TIMESTAMP,
-        };
+    const getMessage = async()=>{
+        try{
+            const messageSnapshot = await get(messageRef)
+            const message = messageSnapshot.val()['content']
+            setMessageContent(JSON.stringify(message))
+        }
+        catch(err){
+            alert(err.message)
+        }
+    }
+    const setReaction = async()=>{
+        try{
+            await update(messageRef,{reaction:"👙"})
+        }
+        catch(err){
+            alert(err.message)
+        }
+    }
 
-        const connectedRef = ref(database,'.info/connected')
-        connectedRef.on('value', (snapshot) => {
-            if (snapshot.val() === false) {
-                return;
-            }
+    return <div>
+        <h2>Message:</h2>
+        <h3>{messageContent}</h3>
+        <button 
+            style={{
+            marginTop:"100px"
+        }}
+            onClick={getMessage}
+        >get message yo</button>
+        <button 
+            style={{
+            marginTop:"100px"
+        }}
+            onClick={setReaction}
+        >add reaction</button>
+        <p>is there a user? {JSON.stringify(user!=null)}</p>
+        <p>user: {JSON.stringify(user)}</p>
+        <p>userLoading: {JSON.stringify(loadingUser)}</p>
+        <p>userError: {JSON.stringify(userError)}</p>
 
-            userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(() => {
-                userStatusDatabaseRef.set(isOnlineForDatabase);
-            });
-        });
+    </div>
 
-        userStatusDatabaseRef.on('value', (snapshot) => {
-            const status = snapshot.val();
-            setIsOnline(status ? status.state === 'online' : false);
-        });
-
-        return () => {
-            userStatusDatabaseRef.off();
-            connectedRef.off();
-        };
-    }, [userId]);
-
-    return (
-        <div>
-            <p>user hKSqdsAIhTOPasn37sULE9bBDjZ2 is {isOnline}</p>
-        </div>
-    );
 };
 
 

@@ -19,7 +19,7 @@ export const MessagesList = ()=>{
     useEffect(() => {
         const handleClick = (event) => {
             const clickedElement = event.target
-            if(clickedElement.id==="reactionBox")return
+            if(clickedElement.id==="reactionOption")return
             setSelectedMessage(clickedElement.id)
             /* Each options menu will have an ID that is the same ID as
             the corresponding message. Every other element in the website
