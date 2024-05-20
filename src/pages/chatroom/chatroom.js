@@ -9,6 +9,7 @@ import 'components/generalStyling/main.css'
 import { House,Send} from "./chatroomSVG"
 import LoadingScreen from "components/loadingScreen/loadingScreen"
 import { MessagesList } from "./messages/messagesList"
+import { ErrorScreen } from "./errorScreen"
 export const ChatroomContext = createContext()
 
 
@@ -42,7 +43,7 @@ const Chatroom = ()=>{
 
     const conversationPartnerRef = 
         user?ref( database,`Users/${user.uid}/CurrentConversation/friend`):null
-        /* here we are getting data about the conversation partner in the user's
+        /* here we are getting the ID of the conversation partner in the user's
         'CurrentConversation' collection to make sure that he is the same as the
         friendID from the URL. If it isn't, then we will have to throw an error. */
 
@@ -53,6 +54,9 @@ const Chatroom = ()=>{
     const friendNameRef = IDisRight?ref(database,`Users/${friendID}/username`):null
     const [friendNameSnap, loadingFriendName, friendNameError] = useObject(friendNameRef)
     
+    const setupError = friendSnapshotError||userError||!IDisRight||friendNameError||usernameError
+    const setupLoading = IDisRight===`loading`||loadingUser||loadingUsername||loadingSnapshotFriend||loadingFriendName
+
     useEffect(()=>{
         if(!IDisRight||!friendNameSnap)return
         setFriendName(friendNameSnap.val())
@@ -111,34 +115,6 @@ const Chatroom = ()=>{
         }
     },[])
 
-    useEffect(()=>{
-        if(!user)return
-        const userMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages`)
-        const unsubscribe=onValue(userMessagesRef,(messageSnapshot)=>{
-            if(!messageSnapshot.exists())return
-            const messagesData = messageSnapshot.val()
-            const messageIDs = Object.keys(messagesData)
-
-            const messagesArray = messageIDs.map(key => ({
-                id: key,
-                dateCreated: messagesData[key].dateCreated,
-                content: messagesData[key].content,
-                sender:user.uid
-            }));
-            
-            messagesArray.forEach((message)=>{
-                if(existentIDs.has(message.id))return
-                setMessages(prevMessages => [...prevMessages,message])
-                existentIDs.add(message.id)
-            }) 
-
-        
-        })
-        return()=>{
-            unsubscribe()
-        }
-    },[user])
-
     useEffect(()=>{ /* get data from friend's message */
         const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
         const unsubscribe = onValue(friendMessagesRef,(messageSnapshot)=>{
@@ -186,9 +162,35 @@ const Chatroom = ()=>{
         return()=>{
             unsubscribe() 
         }
-        
-
     },[])
+
+    useEffect(()=>{ /* loading the user's own messages */
+        if(!user)return
+        const userMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages`)
+        const unsubscribe=onValue(userMessagesRef,(messageSnapshot)=>{
+            if(!messageSnapshot.exists())return
+            const messagesData = messageSnapshot.val()
+            const messageIDs = Object.keys(messagesData)
+
+            const messagesArray = messageIDs.map(key => ({
+                id: key,
+                dateCreated: messagesData[key].dateCreated,
+                content: messagesData[key].content,
+                sender:user.uid
+            }));
+            
+            messagesArray.forEach((message)=>{
+                if(existentIDs.has(message.id))return
+                setMessages(prevMessages => [...prevMessages,message])
+                existentIDs.add(message.id)
+            }) 
+
+        
+        })
+        return()=>{
+            unsubscribe()
+        }
+    },[user])
 
     useEffect(()=>{
         scrollToBottom(chatroomRef.current)
@@ -203,31 +205,16 @@ const Chatroom = ()=>{
         const messageObject = {
             dateCreated:currentDate.getTime(),
             content:text,
-            // messageRecipient:friendID
           }
         /* this is the message document that will be added to the messages
         collection (userMessagesRef). This doesn't have the attribute ID
         because the document itself is an ID */
         try{
             await set(userMessagesRef,messageObject)  
-            // if(existentIDs.has(messageID))return
-            // setMessages(prevMessages=>[...prevMessages,{
-            //     id:messageID,
-            //     dateCreated:currentDate.getTime(),
-            //     content:text,
-            //     sender:user.uid,
-            //     }]);
-            // existentIDs.add(messageID)
-
-
         }
         catch(err){
             alert(err.message)
         }
-        // finally{
-        //     scrollToBottom(chatroomRef.current)
-        // }
-
     }
 
     
@@ -275,24 +262,15 @@ const Chatroom = ()=>{
     }
 
     return <div className="chatroomContainer arial ">
-        {(IDisRight===`loading`||loadingUser||loadingUsername||loadingSnapshotFriend||loadingFriendName)&&
+        {(setupLoading)&&
             <LoadingScreen></LoadingScreen>
         }
-        {((friendSnapshotError||userError||!IDisRight||friendNameError||usernameError)/* &&!friendName */)&& 
+        {(setupError)&& 
         /* the variable friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
-        <div className='arial flexCenter flexColumn errorPageContainer'>
-        <div className="flexCenter" >
-            <h1 style={{marginBottom:"0"}}>🙃</h1>
-            <h2 style={{marginBottom:"0"}}>Whoops</h2>
-        </div>
-        <h3>It looks like something's gone wrong…</h3>
-        <Link to={"/chat"}>Take me home</Link>
-        {/* <button onClick={errorCheck}>Check error</button> */}
-    </div>
+            <ErrorScreen errorCheck={errorCheck}></ErrorScreen>
         }
         
-
         {(IDisRight&&user&&!friendNameError)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
                 <div className="chatHeader flexLeft redBG">

@@ -47,28 +47,7 @@ const StartPage = () =>{
         }
 
     }
-    // const checkDocumentExists = async(id)=>{
-    //     if(userDocument.exists()){
-    //         navigate('/chat')
-    //     }
-    //     else{
-
-    //     }
-    //     try{
-    //         const documentRef = ref(database, `Users/${id}`)
-    //         const snapshot = await get(documentRef)
-    //         if(snapshot.exists()){
-    //             navigate('/chat')
-    //         }
-    //         else{
-    //             addUserToDatabase()
-    //         }
-    //     }
-    //     catch(err){
-    //         addUserToDatabase()
-    //     }
-        
-    // }
+    
     useEffect(()=>{
         if(!user||!userDocument)return
         if(userDocument.exists()){

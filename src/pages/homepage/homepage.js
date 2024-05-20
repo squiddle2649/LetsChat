@@ -29,6 +29,8 @@ const HomePage = ()=>{
 
     const queueCollection = ref(database,"Queue")
 
+    const loadingSetup = (loadingLogout||loadingSnapshot||loadingUser)
+
     /* manage logout */
 
     if(logoutError){
@@ -148,10 +150,10 @@ const HomePage = ()=>{
     }
 
     return <div className='homePageContainer flexCenter '>
-        {(loadingLogout||loadingSnapshot||loadingUser)&& <LoadingScreen></LoadingScreen> }
+        {(loadingSetup)&& <LoadingScreen></LoadingScreen> }
         {(errorUser||snapshotError)&&<p>
             Looks like something went wrong. Try refreshing the page.</p>}
-        {nogo&& 
+        {(nogo&&!loadingSetup)&& 
             <section className='flexCenter flexColumn arial'>
                 <h2 className='arial-bold'>Looks like you're not signed in</h2>
                 <Link to="/">
@@ -169,7 +171,7 @@ const HomePage = ()=>{
             <div className='flexColumn flexCenter'>
                 <p className='arial searchingText'>Searching…</p>
                 <button className ="startChatBtn redBGhover noBorder pointer whiteText " onClick={exitQueue}>
-                    <h2 className="arial">Exit queue</h2>
+                    <h2 className="arial">Cancel</h2>
                 </button>
             </div>
             :
