@@ -37,11 +37,15 @@ export const MessagesList = ()=>{
       }, [selectedMessage])
 
     return <ul className="listOfMessages" reversed>
-        {messages.map((messageObject)=>(
+        {messages.map((messageObject,index)=>(
             <MessagesContext.Provider value={selectedMessage}>
                 <Message
                     username={messageObject.sender===user.uid?
                         username:friendName
+                    }
+                    continuousSender = {
+                        index===0?false:
+                        messageObject.sender===messages[index-1].sender
                     }
                     messageID={messageObject.id}
                     key={messageObject.id}

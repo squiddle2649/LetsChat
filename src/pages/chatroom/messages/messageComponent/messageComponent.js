@@ -37,7 +37,10 @@ export const Message = (props)=>{
         color: me?"#277ab9":"#cd4e67",
         /* Color of username text will depend on whether 
         it is the user sending the message or the conversation partner */
-        margin:"0",
+        marginTop:"28px",
+        marginBottom:"5px",
+        marginRight:"0",
+        marginLeft:"0"
     }   
 
     const showReportModal = ()=>{
@@ -106,9 +109,9 @@ export const Message = (props)=>{
 
     return <div 
                 className="arial flexRow" 
-                style={{marginTop:"8px",
-                    position:'relative',
-                    marginBottom:"15px"}}
+                style={{position:"relative",
+                    alignItems:"center"
+                }}
                 onMouseEnter={()=>{
                     setHoveringMessage(true)
                 }}
@@ -136,9 +139,9 @@ export const Message = (props)=>{
                     </div>
                 </div>
                 <div className="flexColumn">
-                    <p className=" arial-bold" style={usernameStyle}>
+                    {!props.continuousSender&& <h3 className=" arial-bold" style={usernameStyle}>
                         {props.username}
-                    </p>
+                    </h3>}
                     <h3 className="messageText blackText" style={{margin:"0"}}>{props.content}</h3>
                     <div 
                         className='flexCenter'
