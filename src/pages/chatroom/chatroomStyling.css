@@ -6,12 +6,13 @@
     padding: 0;
 }
 .chatroom{
+    position:relative;
+    overflow: scroll;
     height: 69%;
     width:80%;
-    position: relative;
-    overflow-y: scroll;
     word-break: break-word;
     border-radius: 15px;
+    border: 1px solid black;
 }
 .formContainer{
     width: 100%;
@@ -37,7 +38,6 @@
     border-radius: 10px;
     font-size: 17px;
     margin-right: 5px;/* a little distance from the button */
-
     color: white;
 }
 .messageInput:focus{
@@ -49,6 +49,7 @@
 .listOfMessages{
     display: flex;
     flex-direction: column;
+    padding: 0;
 }
 .chatHeader{
     position: relative;
@@ -64,7 +65,8 @@
 }
 .newChat{
     border-radius: 15px;
-    position: absolute;
+    /* position: absolute; */
+    position: fixed;
     right: 30px;
     padding: 0px 15px;
     background-color: var(--darker-red);

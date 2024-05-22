@@ -30,7 +30,7 @@ export const OptionsMenu = (props)=>{
       }, [reactionsToggled])
 
     
-    const optionClass = 'testMenuText redBGhover pointer'
+    const optionClass = 'menuText redBGhover pointer'
       
     return <div className='menuContainer whiteText' style={visibility}>
         <div 

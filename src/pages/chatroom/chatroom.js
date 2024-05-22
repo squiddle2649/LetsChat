@@ -265,7 +265,7 @@ const Chatroom = ()=>{
         {(setupLoading)&&
             <LoadingScreen></LoadingScreen>
         }
-        {(setupError)&& 
+        {setupError&& 
         /* the variable friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
             <ErrorScreen errorCheck={errorCheck}></ErrorScreen>

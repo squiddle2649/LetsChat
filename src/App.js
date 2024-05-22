@@ -3,8 +3,8 @@ import StartPage from 'pages/startPage/startPage';
 import HomePage from 'pages/homePage/homePage';
 import Chatroom from 'pages/chatroom/chatroom';
 import { BrowserRouter as Router, Route,Routes } from 'react-router-dom';
-// import TestPage from 'pages/testPage/testPage';
-import TestPage from 'pages/testPage/testPage';
+import { TestUI } from 'pages/testPage/testUI/testUIPage';
+import TestDB from 'pages/testPage/testDB/DBtestPage';
 import ContactPage from 'pages/contactPage/contactPage';
 
 import {auth} from 'firebaseConfig/firebase'
@@ -17,7 +17,8 @@ function App() {
       <Route path="/chat/:friendID" element={<Chatroom></Chatroom>}/>        
       <Route path='/contact' element={<ContactPage></ContactPage>}></Route>
       <Route path='*' element={<NotFoundPage></NotFoundPage>}></Route>
-      <Route path='/test' element={<TestPage></TestPage> }></Route>
+      <Route path='/testdb' element={<TestDB></TestDB> }></Route>
+      <Route path='/testui' element={<TestUI></TestUI> }></Route>
       </Routes>
     </Router>
   );

@@ -40,10 +40,6 @@ export const Message = (props)=>{
         margin:"0",
     }   
 
-    const optionButtonVisibility = {
-        display:hoveringMessage?"":"none"
-    }
-
     const showReportModal = ()=>{
         reportWindow.current.showModal()
     }
@@ -100,8 +96,6 @@ export const Message = (props)=>{
     }
     
     const selectedReactionStyling = {
-        position: "absolute",
-        bottom: "-10px",
         padding: "1px 10px",
         border: "1px solid rgb(166, 59, 223)",
         backgroundColor:"rgba(166, 59, 223, 0.08)",
@@ -111,7 +105,7 @@ export const Message = (props)=>{
     }
 
     return <div 
-                className="arial flexRow flexSpaceBetween" 
+                className="arial flexRow" 
                 style={{marginTop:"8px",
                     position:'relative',
                     marginBottom:"15px"}}
@@ -123,17 +117,34 @@ export const Message = (props)=>{
                     setHoveringMessage(false)
                 }}   
             >
+                
+                <div className="messageOptionContainer" 
+                    style={{/* backgroundColor:'aqua', */
+                            display:"flex",
+                            alignItems:"center"
+                    }}>
+                    
+                    <div style={{
+                            visibility:hoveringMessage?"":"hidden",
+                            position:'relative'
+                            // backgroundColor:'pink'
+                        }}>
+                        <MessageContext.Provider value={messageContextVal}>
+                            <OptionsMenu visible={showMenu}></OptionsMenu>
+                        </MessageContext.Provider>
+                        <OptionsSVG messageID={messageID}></OptionsSVG>
+                    </div>
+                </div>
                 <div className="flexColumn">
                     <p className=" arial-bold" style={usernameStyle}>
                         {props.username}
                     </p>
-                    <h3 className="messageText blackText" style={{marginTop:"0"}}>{props.content}</h3>
-                </div>
-                <div className="messageOptionContainer" style={optionButtonVisibility}>
-                    <MessageContext.Provider value={messageContextVal}>
-                        <OptionsMenu visible={showMenu}></OptionsMenu>
-                    </MessageContext.Provider>
-                    <OptionsSVG messageID={messageID}></OptionsSVG>
+                    <h3 className="messageText blackText" style={{margin:"0"}}>{props.content}</h3>
+                    <div 
+                        className='flexCenter'
+                        style={selectedReactionStyling}>
+                        <div>{selectedReaction}</div>
+                    </div>
                 </div>
                 <dialog ref={reportWindow} className='reportWindow'>
                     {reportWasFiled&&
@@ -174,11 +185,7 @@ export const Message = (props)=>{
                     </div>
 
                 </dialog>
-                <div 
-                    className='flexCenter'
-                    style={selectedReactionStyling}>
-                    <div>{selectedReaction}</div>
-                </div>
+                
 
             
         </div>
