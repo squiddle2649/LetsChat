@@ -100,8 +100,8 @@ export const Message = (props)=>{
         border: "1px solid rgb(166, 59, 223)",
         backgroundColor:"rgba(166, 59, 223, 0.08)",
         borderRadius: "5px",
-        display:selectedReaction?"":"none"
-        
+        display:selectedReaction?"":"none",
+        width:"fit-content"
     }
 
     return <div 
@@ -163,21 +163,23 @@ export const Message = (props)=>{
                                 </p>
                                 <h3 className="messageText blackText" style={{margin:"0"}}>{props.content}</h3>
                             </div>
-                            <form className='flexColumn' onSubmit={(e)=>{
-                                e.preventDefault()
-                                fileReport()
-                            }}>
-                                <label>Please describe the problem</label>
-                                <input  className='arial' onChange={(e)=>{
-                                    setReportText(e.target.value)
-                                }}
-                                required
-                                ></input>
-                                <button
-                                    type='submit'
-                                    className='submitReport noBorder pointer'
-                                >Submit</button>
-                            </form>
+                            <div>
+                                <form className='flexColumn' onSubmit={(e)=>{
+                                    e.preventDefault()
+                                    fileReport()
+                                }}>
+                                    <label>Please describe the problem</label>
+                                    <input className='arial reportInput' onChange={(e)=>{
+                                        setReportText(e.target.value)
+                                    }}
+                                    // required
+                                    ></input>
+                                    <button
+                                        type='submit'
+                                        className='submitReport noBorder pointer whiteText'
+                                    >Submit</button>
+                                </form>
+                            </div>
                         </div>
                     }
                     <div onClick={closeReportModal}>

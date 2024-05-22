@@ -301,11 +301,13 @@ const Chatroom = ()=>{
                                     className="messageInput redBG" 
                                     placeholder={`Message ${friendName}`}
                                     onChange={(e)=>{
-                                    setCurrentMessage(e.target.value)
-                                }}>
+                                        setCurrentMessage(e.target.value)
+                                    }}>
                                     
                                 </input>
-                                <button type="submit" className="sendButton redBGhover pointer noBorder"> <Send></Send> </button>
+                                <div className="sendButtonContainer flexCenter">
+                                    <button type="submit" className="sendButton redBGhover pointer noBorder"> <Send></Send> </button>
+                                </div>
                             </form>
                         </div>
             </div>

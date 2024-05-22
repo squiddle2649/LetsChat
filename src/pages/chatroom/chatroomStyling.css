@@ -7,44 +7,46 @@
 }
 .chatroom{
     position:relative;
-    overflow: scroll;
+    overflow: auto;
     height: 69%;
     width:80%;
     word-break: break-word;
-    border-radius: 15px;
-    border: 1px solid black;
+    /* border-radius: 15px; */
+    border-left: 2px solid black;
+    border-right: 2px solid black;
 }
 .formContainer{
     width: 100%;
     margin-bottom: 30px;
 }
 .messageForm{
-    height: 40px;
+    height: 55px;
     display: flex;
-    margin-top: 10px;
-    margin-left: 4px;
     width: 80%;
-    border-radius: 10px;
-    padding: 5px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border:2px solid black
 }
 
 .darker{
     background-color: #cf3b56;
 }
 .messageInput{
-    padding: 5px;
     width: 100%;
+    margin: 0 5px;
     border:none;
     border-radius: 10px;
     font-size: 17px;
-    margin-right: 5px;/* a little distance from the button */
+    margin-right: 5px;
     color: white;
 }
 .messageInput:focus{
     outline: none;
 }
 .messageInput::placeholder{
-    color: rgb(226, 198, 198);
+    color: rgb(255, 255, 255);
 }
 .listOfMessages{
     display: flex;
@@ -54,8 +56,11 @@
 .chatHeader{
     position: relative;
     width: 80%;
-    margin-bottom: 10px;
-    border-radius: 15px;
+    /* margin-bottom: 10px; */
+    border-top-left-radius: 15px; 
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 0; 
+    border-bottom-right-radius: 0;
     border: 2px solid #222828;
 }
 .vl{
@@ -77,5 +82,8 @@
 }
 
 .sendButton{
+    height: fit-content;
     border-radius: 15px;
+    margin: 0 5px;
+    padding: 7px 3px;
 }
