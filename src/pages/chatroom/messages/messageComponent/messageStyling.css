@@ -1,3 +1,12 @@
+.messageContainer{
+    position:relative;
+    align-items:center;
+}
+
+.messageHighlight{
+    background-color: rgb(255, 226, 231);
+}
+
 .menuContainer{
     background-color: var(--dark-red);
     position: absolute;
@@ -92,15 +101,16 @@
 
 .emojisContainer{
     background-color: var(--dark-red);
-    /* position: fixed; */
     position: absolute;
     top: 0;
     left: 108%;
     border-radius: 5px;
+    z-index: 2;
+    padding: 0px 10px;
+}
+.emojisBox{
     display: grid;
     grid-template-columns: repeat(4,1fr);
-    padding: 0px 10px;
-    z-index: 2;
 }
 .emoji{
     margin: 10px;
@@ -109,4 +119,14 @@
     height: fit-content;
     width: fit-content;
 
+}
+.removeReactionBtn{
+    color:white;
+    border: none;
+    border-radius: 2px;
+    margin-top: 5px;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    transition-duration: 0ms;
 }

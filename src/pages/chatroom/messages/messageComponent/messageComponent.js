@@ -15,7 +15,8 @@ export const Message = (props)=>{
     const [hoveringMessage,setHoveringMessage] = useState(false)
     const [reportText, setReportText] = useState("")
     const [reportWasFiled,setReportWasFiled] = useState(false)
-    const [selectedReaction, setReaction] = useState(null)
+    const [userReaction, setUserReaction] = useState(null)
+    const [friendReaction, setFriendReaction] = useState(null)
 
     const messagesContext = useContext(MessagesContext)
     const selectedMessage = messagesContext
@@ -35,12 +36,9 @@ export const Message = (props)=>{
 
     const usernameStyle= {
         color: me?"#277ab9":"#cd4e67",
-        /* Color of username text will depend on whether 
-        it is the user sending the message or the conversation partner */
-        marginTop:"28px",
-        marginBottom:"5px",
-        marginRight:"0",
-        marginLeft:"0"
+        marginBottom:'0',
+        marginTop:"15px"
+
     }   
 
     const showReportModal = ()=>{
@@ -53,7 +51,13 @@ export const Message = (props)=>{
 
     const addAreaction = async(reaction)=>{
         try{
-            await update(messageReactionRef,{reaction:reaction})
+            if(me){
+                await update(messageReactionRef,{userReaction:reaction})
+            }
+            else{
+                await update(messageReactionRef,{friendReaction:reaction})
+
+            }
         }
         catch(err){     
             alert(err.message)
@@ -63,8 +67,20 @@ export const Message = (props)=>{
     useEffect(()=>{
         const unsubscribe = onValue(messageReactionRef,(snapshot)=>{
             const messageData = snapshot.val()
-            const reaction = messageData['reaction']
-            setReaction(reaction)
+            if(me){
+                const friendEmoji = messageData['friendReaction']
+                setFriendReaction(friendEmoji)
+                const userEmoji = messageData['userReaction']
+                setUserReaction(userEmoji)
+                console.log(userEmoji)
+            }
+            else{
+                const friendEmoji = messageData['userReaction']
+                setFriendReaction(friendEmoji)
+                const userEmoji = messageData['friendReaction']
+                setUserReaction(userEmoji)
+                console.log(userEmoji)
+            }
         })
         return ()=>{
             unsubscribe()
@@ -98,20 +114,28 @@ export const Message = (props)=>{
 
     }
     
-    const selectedReactionStyling = {
+    const userReactionStyling = {
         padding: "1px 10px",
-        border: "1px solid rgb(166, 59, 223)",
-        backgroundColor:"rgba(166, 59, 223, 0.08)",
+        border: "1px solid #277ab9",
+        backgroundColor:"rgb(39, 122,185,0.41)",
         borderRadius: "5px",
-        display:selectedReaction?"":"none",
-        width:"fit-content"
+        display:userReaction?"":"none",
+        width:"fit-content",
+        marginBottom:"8px"
+    }
+    const friendReactionStyling = {
+        padding: "1px 10px",
+        border: "1px solid #cd4e67",
+        backgroundColor:"rgb(205, 78, 103,0.41)",
+        borderRadius: "5px",
+        display:friendReaction?"":"none",
+        width:"fit-content",
+        marginBottom:"8px"
     }
 
     return <div 
-                className="arial flexRow" 
-                style={{position:"relative",
-                    alignItems:"center"
-                }}
+                className="arial flexRow messageContainer" 
+                style={{backgroundColor:hoveringMessage?"rgb(234, 234, 234)":""}}
                 onMouseEnter={()=>{
                     setHoveringMessage(true)
                 }}
@@ -121,16 +145,11 @@ export const Message = (props)=>{
                 }}   
             >
                 
-                <div className="messageOptionContainer" 
-                    style={{/* backgroundColor:'aqua', */
-                            display:"flex",
-                            alignItems:"center"
-                    }}>
+                <div className="messageOptionContainer flexAlignCenter">
                     
                     <div style={{
                             visibility:hoveringMessage?"":"hidden",
                             position:'relative'
-                            // backgroundColor:'pink'
                         }}>
                         <MessageContext.Provider value={messageContextVal}>
                             <OptionsMenu visible={showMenu}></OptionsMenu>
@@ -143,10 +162,18 @@ export const Message = (props)=>{
                         {props.username}
                     </h3>}
                     <h3 className="messageText blackText" style={{margin:"0"}}>{props.content}</h3>
-                    <div 
-                        className='flexCenter'
-                        style={selectedReactionStyling}>
-                        <div>{selectedReaction}</div>
+                    <div className="flexCenter reactionsContainer"
+                         style={{width:"fit-content"}}>
+                        <div
+                            className='flexCenter'
+                            style={userReactionStyling}>
+                            <div>{userReaction}</div>
+                        </div>
+                        <div
+                            className='flexCenter'
+                            style={friendReactionStyling}>
+                            <div>{friendReaction}</div>
+                        </div>
                     </div>
                 </div>
                 <dialog ref={reportWindow} className='reportWindow'>

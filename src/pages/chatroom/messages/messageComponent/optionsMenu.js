@@ -8,7 +8,7 @@ export const OptionsMenu = (props)=>{
     const showModal = messageContext.showModal
     const addAReaction = messageContext.addAReaction
     const me = messageContext.me
-    const emojis = ["😃","😂","👍","🍆","🤨","😱","😭"]
+    const emojis = ["😃","😂","😬","🤨","😎","😱","😭","🙄","🤝",'👍',"✌️","👏"]
 
     const [reactionsToggled, setReactionsToggled] = useState(false)
     const visibility={
@@ -44,19 +44,21 @@ export const OptionsMenu = (props)=>{
         <div id="reactionOption" className={`${optionClass} reactionOption`}>
             <div id="reactionOption">Add a reaction</div>
             <div style={emojisVisibility} className='emojisContainer'>
-                
-                {emojis.map((emoji)=>(
-                    <h1 className='redBGhover emoji'
+                <button className='removeReactionBtn redBGhover'
                         onClick={()=>{
-                            addAReaction(emoji)
+                            addAReaction(null)
                         }}
-                    >{emoji}</h1>
-                ))}
-                <h1 className='redBGhover emoji'
-                    onClick={()=>{
-                        addAReaction(null)
-                    }}
-                >❌</h1>
+                >Remove reaction</button>
+                <div className="emojisBox">
+                    {emojis.map((emoji)=>(
+                        <h1 className='emoji redBGhover'
+                            onClick={()=>{
+                                addAReaction(emoji)
+                            }}
+                        >{emoji}</h1>
+                    ))}
+                   
+                </div>
             </div>
         </div>
 
