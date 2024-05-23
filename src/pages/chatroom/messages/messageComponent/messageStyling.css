@@ -1,16 +1,28 @@
 .messageContainer{
     position:relative;
-    align-items:center;
+    width:100%
 }
 
 .messageHighlight{
     background-color: rgb(255, 226, 231);
 }
 
+.messageText{
+    width:100%;
+    margin: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.reactionsContainer{
+    width: fit-content;   
+    margin-left: 35px;
+}
+
 .menuContainer{
     background-color: var(--dark-red);
     position: absolute;
-    width: 150px;
+    width: max-content;
     top: 0;
     left: 100%;
     padding: 5px;
@@ -27,7 +39,7 @@
     transition-duration: 100ms;
 }
 .optionsSVG{
-    margin: 0 10px;
+    margin: 2px 5px;
     padding: 5px;
     border-radius: 100%;
 }
@@ -72,6 +84,7 @@
     max-height:150px;
     overflow-y: auto;
 }
+
 .reportInput{
     font-size: large;
 }
@@ -87,13 +100,6 @@
     position: absolute;
     left:400px;
     top:400px;
-}
-.menuText{
-    margin: 0;
-    padding: 7px;
-    border-radius: 5px;
-    transition-duration: 100ms;
-    position:relative;
 }
 .reactionOption{
     position: relative;

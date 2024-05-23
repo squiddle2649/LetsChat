@@ -37,8 +37,8 @@ export const Message = (props)=>{
     const usernameStyle= {
         color: me?"#277ab9":"#cd4e67",
         marginBottom:'0',
-        marginTop:"15px"
-
+        marginTop:"15px",
+        marginLeft:"38px"
     }   
 
     const showReportModal = ()=>{
@@ -135,7 +135,6 @@ export const Message = (props)=>{
 
     return <div 
                 className="arial flexRow messageContainer" 
-                style={{backgroundColor:hoveringMessage?"rgb(234, 234, 234)":""}}
                 onMouseEnter={()=>{
                     setHoveringMessage(true)
                 }}
@@ -143,27 +142,27 @@ export const Message = (props)=>{
                     if(showMenu)return
                     setHoveringMessage(false)
                 }}   
-            >
-                
-                <div className="messageOptionContainer flexAlignCenter">
-                    
-                    <div style={{
-                            visibility:hoveringMessage?"":"hidden",
-                            position:'relative'
-                        }}>
-                        <MessageContext.Provider value={messageContextVal}>
-                            <OptionsMenu visible={showMenu}></OptionsMenu>
-                        </MessageContext.Provider>
-                        <OptionsSVG messageID={messageID}></OptionsSVG>
-                    </div>
-                </div>
-                <div className="flexColumn">
-                    {!props.continuousSender&& <h3 className=" arial-bold" style={usernameStyle}>
-                        {props.username}
-                    </h3>}
-                    <h3 className="messageText blackText" style={{margin:"0"}}>{props.content}</h3>
-                    <div className="flexCenter reactionsContainer"
-                         style={{width:"fit-content"}}>
+            >  
+                <div className="flexColumn" style={{width:"100%"}}>
+                    {!props.continuousSender&& 
+                        <h3 className=" arial-bold" style={usernameStyle}>
+                            {props.username}
+                        </h3>}
+                    <h3 className="messageText blackText" 
+                        style={{backgroundColor:hoveringMessage?"rgb(234, 234, 234)":""}}>
+                        <div style={{
+                                visibility:hoveringMessage?"":"hidden",
+                                display:"flex",
+                                alignItems:"center",
+                                position:'relative'}}>
+                            <MessageContext.Provider value={messageContextVal}>
+                                <OptionsMenu visible={showMenu}></OptionsMenu>
+                            </MessageContext.Provider>
+                            <OptionsSVG messageID={messageID}></OptionsSVG>
+                        </div>
+                        {props.content}
+                    </h3>
+                    <div className="flexCenter reactionsContainer">
                         <div
                             className='flexCenter'
                             style={userReactionStyling}>
