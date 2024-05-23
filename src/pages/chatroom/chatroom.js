@@ -19,8 +19,8 @@ const Chatroom = ()=>{
     const [user,loadingUser,userError] = useAuthState(auth)
     const [messages,setMessages] = useState([])
     const [currentMessage, setCurrentMessage] = useState("")
-    const [username, setUsername] = useState("louis")    
-    const [friendName, setFriendName] = useState("thomas")    
+    const [username, setUsername] = useState(null)    
+    const [friendName, setFriendName] = useState(null)    
     const [friendOffline, setFriendOffline] = useState(false)
 
     const existentIDs = new Set();
@@ -54,7 +54,11 @@ const Chatroom = ()=>{
     const friendNameRef = IDisRight?ref(database,`Users/${friendID}/username`):null
     const [friendNameSnap, loadingFriendName, friendNameError] = useObject(friendNameRef)
     
-    const setupError = friendSnapshotError||userError||!IDisRight||friendNameError||usernameError
+    let setupError = (friendSnapshotError||
+        userError||
+        !IDisRight||
+        friendNameError||
+        usernameError)/* &&!friendNameSnap */
     const setupLoading = IDisRight===`loading`||loadingUser||loadingUsername||loadingSnapshotFriend||loadingFriendName
 
     useEffect(()=>{
@@ -72,17 +76,22 @@ const Chatroom = ()=>{
     }
 
     useEffect(()=>{
-        if(!user)return
-
-        const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
-        onDisconnect(currentConversation).update({userOffline:true})
-        /* remove currentConversation subcollection from the user's document
-        when he disconnects. */
+        const setupDisconnect = ()=>{
+            if(!user)return
+            const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
+            onDisconnect(currentConversation).update({userOffline:true})
+            /* remove currentConversation subcollection from the user's document
+            when he disconnects. */
+        }
         
         return ()=>{
-            console.log('cleaning up')
+            setupDisconnect()
         }
     }, [user]);
+
+    // useEffect(()=>{
+    //     // console.log(JSON.stringify(friendNameSnap))
+    // },[friendNameSnap])
 
     useEffect(()=>{
         if(!user||!friendSnapshot||!usernameSnapshot)return
@@ -268,7 +277,7 @@ const Chatroom = ()=>{
         {setupError&& 
         /* the variable friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
-            <ErrorScreen errorCheck={errorCheck}></ErrorScreen>
+            <ErrorScreen></ErrorScreen>
         }
         
         {(IDisRight&&user&&!friendNameError)&&

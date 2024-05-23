@@ -1,4 +1,6 @@
-
+#root{
+    --chatroomWidth:95%;    
+}
 
 .chatroomContainer{
     height: 100vh;
@@ -9,7 +11,8 @@
     position:relative;
     overflow: auto;
     height: 69%;
-    width:80%;
+    /* width:80%; */
+    width: var(--chatroomWidth);
     word-break: break-word;
     /* border-radius: 15px; */
     border-left: 2px solid black;
@@ -22,7 +25,7 @@
 .messageForm{
     height: 55px;
     display: flex;
-    width: 80%;
+    width: var(--chatroomWidth);
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     border-bottom-left-radius: 15px;
@@ -55,7 +58,7 @@
 }
 .chatHeader{
     position: relative;
-    width: 80%;
+    width: var(--chatroomWidth);
     /* margin-bottom: 10px; */
     border-top-left-radius: 15px; 
     border-top-right-radius: 15px;
