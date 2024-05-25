@@ -211,7 +211,6 @@ const Header = (props)=>{
                 onClick={()=>{
                 props.exitQueue()
                 props.signOut();
-                console.log("outa here")
                 props.navigate('/')
             }}>
                 <SignOutArrow></SignOutArrow>

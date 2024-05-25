@@ -21,6 +21,7 @@ export const Message = (props)=>{
     const messagesContext = useContext(MessagesContext)
     const selectedMessage = messagesContext
     const reportWindow = useRef(null)
+    const messageElement = useRef(null)
     const messageID = props.messageID
     const me = props.me
 
@@ -30,6 +31,8 @@ export const Message = (props)=>{
     const user = chatroomContext.user
     const friendID = chatroomContext.friendID
     const generateRandomKey = chatroomContext.generateRandomKey
+    const chatroomRef = chatroomContext.chatroomRef
+    const scrolledToBottom = chatroomContext.scrolledToBottom
 
     const senderID = me?user.uid:friendID
     const messageReactionRef =ref(database,`Users/${senderID}/CurrentConversation/Messages/${messageID}`)
@@ -38,7 +41,7 @@ export const Message = (props)=>{
         color: me?"#277ab9":"#cd4e67",
         marginBottom:'0',
         marginTop:"15px",
-        marginLeft:"38px"
+        marginLeft:"35px"
     }   
 
     const showReportModal = ()=>{
@@ -48,6 +51,35 @@ export const Message = (props)=>{
         reportWindow.current.close()
         setReportWasFiled(false)
     }
+
+    const isOverflowing = ()=>{
+        const chatroomRect = chatroomRef.current.getBoundingClientRect()
+        const messageRect = messageElement.current.getBoundingClientRect()
+        const overflowing = chatroomRect.bottom<messageRect.top
+        return overflowing
+    }
+
+    const isScrolledToBottom=()=> {
+        if (!chatroomRef.current) return false; // Handle missing ref
+      
+        const scrollTop = chatroomRef.current.scrollTop;
+        const scrollHeight = chatroomRef.current.scrollHeight;
+        const clientHeight = chatroomRef.current.clientHeight;
+      
+        // Check if scrolled to the bottom considering potential content padding
+        return scrollTop + clientHeight >= scrollHeight;
+      }
+
+    useEffect(()=>{
+        const senderIsFriend = senderID===friendID
+
+        console.log(`isAtBottom: ${scrolledToBottom}`)
+        console.log(`senderIsFriend: ${senderIsFriend}`)
+        if(senderIsFriend&&!scrolledToBottom)return
+        
+        chatroomRef.current.scrollTop = chatroomRef.current.scrollHeight
+        
+    },[])
 
     const addAreaction = async(reaction)=>{
         try{
@@ -72,20 +104,22 @@ export const Message = (props)=>{
                 setFriendReaction(friendEmoji)
                 const userEmoji = messageData['userReaction']
                 setUserReaction(userEmoji)
-                console.log(userEmoji)
             }
             else{
                 const friendEmoji = messageData['userReaction']
                 setFriendReaction(friendEmoji)
                 const userEmoji = messageData['friendReaction']
                 setUserReaction(userEmoji)
-                console.log(userEmoji)
             }
         })
         return ()=>{
             unsubscribe()
         }
     },[])
+
+    // useEffect(()=>{
+    //     if(senderID===friendID)return
+    // },[])
 
     const fileReport = async()=>{
         const reportID = generateRandomKey(20)
@@ -133,7 +167,7 @@ export const Message = (props)=>{
         marginBottom:"8px"
     }
 
-    return <div 
+    return <div ref={messageElement}
                 className="arial flexRow messageContainer" 
                 onMouseEnter={()=>{
                     setHoveringMessage(true)
@@ -215,10 +249,7 @@ export const Message = (props)=>{
                         <CloseWindowSVG></CloseWindowSVG>
                     </div>
 
-                </dialog>
-                
-
-            
+                </dialog>            
         </div>
  
 }

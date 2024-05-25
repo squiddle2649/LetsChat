@@ -1,41 +1,11 @@
 .pageContainer{
-    width: 100vw;
-    height: 100vh;
+    width:100vw;
+    height:100vh;
     background-color: greenyellow;
 }
-.container{
-    height: 300px;
-    width:70%;
-    background-color: cadetblue;
-    overflow: auto;
-    scroll-behavior: auto;
-    display: flex;
-    align-items: start;
-    /* justify-content: left; */
-    justify-content: right; 
-}
-
-.child{
-    position: absolute;
-    top:0;
-    right: 108%;
-    background-color:crimson;
-    border-right: 8px solid green;
-    display: grid;
-    grid-template-columns: repeat(4,1fr);
-}
-.toggle{
-    width: 50px;
-    aspect-ratio: 1;
-    background-color: blueviolet;
-    position: relative;
-}
-
-.options{
-    position: absolute;
-    border-right: 7px solid blue;
-    top: 100%;
-    right: 108%;
-    width: 200px;
-    background-color: crimson;
+.box{
+    width: 400px;
+    height:300px;
+    background-color: red;
+    overflow-y: scroll;
 }

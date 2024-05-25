@@ -8,12 +8,14 @@ export const MessagesContext = createContext()
 
 export const MessagesList = ()=>{
     const chatroomContext = useContext(ChatroomContext)
+    const chatroomRef = chatroomContext.chatroomRef
     const messages = chatroomContext.messages
     const user = chatroomContext.user
     const username = chatroomContext.username
     const friendName = chatroomContext.friendName
 
     const [selectedMessage, setSelectedMessage] = useState(null)
+    
     
 
     useEffect(() => {
@@ -54,6 +56,7 @@ export const MessagesList = ()=>{
                 ></Message>
             </MessagesContext.Provider>
         ))}
+       
     </ul>
 }
 

@@ -18,6 +18,19 @@
     border-left: 2px solid black;
     border-right: 2px solid black;
 }
+.notificationContainer{
+    position:absolute;
+    top:0;
+    left:10px;
+    width:fit-content;
+    z-index:4;
+}
+.notification{
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    background-color: rgb(26, 97, 74);
+    padding: 10px 5px
+}
 .formContainer{
     width: 100%;
     margin-bottom: 30px;
@@ -55,6 +68,7 @@
     display: flex;
     flex-direction: column;
     padding: 0;
+    margin:0
 }
 .chatHeader{
     position: relative;
@@ -86,7 +100,10 @@
 
 .sendButton{
     height: fit-content;
-    border-radius: 15px;
-    margin: 0 5px;
-    padding: 7px 3px;
+    border-radius: 11px;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 3px;
+    margin-right:5px;
+    padding: 7px 10px;
 }

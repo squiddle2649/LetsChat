@@ -1,6 +1,6 @@
 import { useParams,Link } from "react-router-dom"
 import { database,auth } from "firebaseConfig/firebase"
-import { ref, set,onDisconnect,onValue,get, remove,update } from "firebase/database"
+import { ref, set,onDisconnect,onValue, remove,update } from "firebase/database"
 import { useObject } from "react-firebase-hooks/database"
 import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect,useRef,createContext } from 'react';
@@ -22,7 +22,6 @@ const Chatroom = ()=>{
     const [username, setUsername] = useState(null)    
     const [friendName, setFriendName] = useState(null)    
     const [friendOffline, setFriendOffline] = useState(false)
-
     const existentIDs = new Set();
     
     const chatroomRef = useRef(null)
@@ -34,7 +33,6 @@ const Chatroom = ()=>{
             top:element.scrollHeight,
             left: 0,
         })
-
     }
     const usernameRef = 
         user?ref( database,`Users/${user.uid}/username`):null
@@ -65,6 +63,8 @@ const Chatroom = ()=>{
         if(!IDisRight||!friendNameSnap)return
         setFriendName(friendNameSnap.val())
     },[IDisRight,friendNameSnap])
+
+    const [mesagesReceived, setMessagesReceived] = []
 
     const setOnline = async(ref)=>{
         try{
@@ -116,18 +116,31 @@ const Chatroom = ()=>{
         const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
             const friendIsOffline = snapshot.val()["userOffline"]
             setFriendOffline(friendIsOffline)
-
         })
-        
         return ()=>{
             unsubscribe()    
         }
     },[])
 
+    const isScrolledToBottom = () => {
+
+        if (!chatroomRef.current) return false; // Handle missing ref
+        
+        const scrollTop = chatroomRef.current.scrollTop;
+        const scrollHeight = chatroomRef.current.scrollHeight;
+        const clientHeight = chatroomRef.current.clientHeight;
+      
+        // Check if scrolled to the bottom considering potential content padding
+        return scrollTop + clientHeight >= scrollHeight;
+    }
+
     useEffect(()=>{ /* get data from friend's message */
         const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
         const unsubscribe = onValue(friendMessagesRef,(messageSnapshot)=>{
-            if(!messageSnapshot.exists())return
+            if(!messageSnapshot.exists()){
+                setReceivedMessages(prevMessages => [...prevMessages,"friend"])
+                return
+            }
             const messagesData = messageSnapshot.val()
             /* format of messagesData:
                 {
@@ -140,7 +153,6 @@ const Chatroom = ()=>{
             of the other user: messageIDs = ["l31g41yk","l31g41yk"] */
 
             /* 
-                I have the following array in javascript:
                 [
                     {id:'elfisu',dateCreated:12},
                     {id:'almina',dateCreated:21},
@@ -166,6 +178,7 @@ const Chatroom = ()=>{
                 setMessages(prevMessages => [...prevMessages,message])
                 existentIDs.add(message.id)
             }) 
+            setReceivedMessages(prevMessages => [...prevMessages,"friend"])
 
         })
         return()=>{
@@ -177,7 +190,10 @@ const Chatroom = ()=>{
         if(!user)return
         const userMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages`)
         const unsubscribe=onValue(userMessagesRef,(messageSnapshot)=>{
-            if(!messageSnapshot.exists())return
+            if(!messageSnapshot.exists()){
+                setReceivedMessages(prevMessages => [...prevMessages,"user"])    
+                return
+            }
             const messagesData = messageSnapshot.val()
             const messageIDs = Object.keys(messagesData)
 
@@ -193,19 +209,38 @@ const Chatroom = ()=>{
                 setMessages(prevMessages => [...prevMessages,message])
                 existentIDs.add(message.id)
             }) 
-
-        
+            setReceivedMessages(prevMessages => [...prevMessages,"user"])    
         })
         return()=>{
             unsubscribe()
         }
     },[user])
+    
+    const [receivedMessages, setReceivedMessages] = useState([])
 
-    useEffect(()=>{
-        scrollToBottom(chatroomRef.current)
+    const [scrolledToBottom,setScrolledToBottom] = useState(false)
+    useEffect(() => {
+        const handleScroll = () => {
+            if(!isScrolledToBottom()){
+                setScrolledToBottom(false)
+            }
+            else{
+                setScrolledToBottom(true)
+            }
+        }
+        document.addEventListener('scroll', handleScroll);
+
+        return () => {
+          document.removeEventListener('scroll', handleScroll);
+        };
+      }, [])
+
+    useEffect(() => {
+        if (!chatroomRef.current||!messages[0])return
         messages.sort((a, b) => a.dateCreated - b.dateCreated);
-        /* whenever a new message gets added, we scroll to bottom */
-    },[messages])
+        if(receivedMessages.length>2)return
+        chatroomRef.current.scrollTop = chatroomRef.current.scrollHeight;
+      }, [existentIDs,messages]);
 
     const sendMessage = async(text)=>{
         const messageID = generateRandomKey(20)
@@ -258,7 +293,10 @@ const Chatroom = ()=>{
         friendName:friendName,
         username:username,
         friendID:friendID,
-        generateRandomKey:generateRandomKey
+        generateRandomKey:generateRandomKey,
+        chatroomRef:chatroomRef,
+        scrolledToBottom:scrolledToBottom
+        
         /* this information has to be communicated to the MessagesList component
         through a context provider */
     }
@@ -282,7 +320,15 @@ const Chatroom = ()=>{
         
         {(IDisRight&&user&&!friendNameError)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
-                {/* <button onClick={resetMessages}>Reset messages</button> */}
+                <button onClick={()=>{
+                    console.log(chatroomRef.current.scrollTop)
+                }}>scroll top</button>
+                <button onClick={()=>{
+                    console.log(chatroomRef.current.scrollHeight)
+                }}>scroll height</button>
+                <button onClick={()=>{
+                    console.log(chatroomRef.current.clientHeight)
+                }}>client height</button>
                 <div className="chatHeader flexLeft redBG">
                     <Link to={'/chat'}> <House></House> </Link>
                     <div className="vl"></div>
@@ -290,8 +336,14 @@ const Chatroom = ()=>{
                         You are speaking to {friendName} 
                         {friendOffline&& " (user disconnected)"}
                      </h2>
+                     {/* {unreadMessages.length>1&& 
+                        <div className="notificationContainer">
+                            <div className="notification whiteText">
+                                {unreadMessages.length} unread messages
+                            </div>
+                        </div>} */}
                 </div>
-                    <div ref={chatroomRef}  className="chatroom">
+                    <div ref={chatroomRef}  className="chatroom" id="chatroom">
                         <ChatroomContext.Provider value={chatroomContextVal}>
                             <MessagesList></MessagesList>
                         </ChatroomContext.Provider>
