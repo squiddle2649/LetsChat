@@ -10,6 +10,9 @@
 .chatroom{
     position:relative;
     overflow: auto;
+    scroll-behavior: smooth;
+
+    /* overflow: visible; */
     height: 69%;
     width: var(--chatroomWidth);
     word-break: break-word;

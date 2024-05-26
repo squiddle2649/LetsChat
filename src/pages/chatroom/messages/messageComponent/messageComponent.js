@@ -56,9 +56,12 @@ export const Message = (props)=>{
         setReportWasFiled(false)
     }
 
-    useEffect(()=>{
-        const senderIsFriend = senderID===friendID
-        if(senderIsFriend&&!scrolledToBottom){
+    useEffect(()=>{        
+        if(senderID===friendID&&!scrolledToBottom){
+            /* first condition means that the message has come
+            from the friend. If user is not scrolled to bottom, 
+            that means he has not read the message, therefore
+            we push the messsage to the unreadMessages array */
             if(unreadSet.has(messageID))return
             setUnreadMessages(prevMessages => [...prevMessages,messageID])
             unreadSet.add(messageID)
@@ -80,10 +83,15 @@ export const Message = (props)=>{
 
     useEffect(() => {
         const handleScroll = () => {
+
             if(isChildOverflowing())return
-            const newUnreadMessages = 
-                unreadMessages.filter(item => item !== messageID);
-            setUnreadMessages(newUnreadMessages);
+            
+            if(unreadMessages.includes(messageID)){
+                const newUnreadMessages = 
+                    unreadMessages.filter(item => item !== messageID);
+                setUnreadMessages(newUnreadMessages);
+            }
+            
             
         }
         if(!chatroomRef.current)return
@@ -93,7 +101,7 @@ export const Message = (props)=>{
             if(!chatroomRef.current)return
             chatroomRef.current.removeEventListener('scroll', handleScroll);
         };
-    }, [])
+    }, [chatroomRef.current,unreadMessages])
 
     const addAreaction = async(reaction)=>{
         try{
@@ -210,6 +218,9 @@ export const Message = (props)=>{
                             <OptionsSVG messageID={messageID}></OptionsSVG>
                         </div>
                         {props.content}
+                        {/* <button onClick={()=>{
+                            console.log(isChildOverflowing())
+                        }}>overflowing?</button> */}
                     </h3>
                     <div className="flexCenter reactionsContainer">
                         <div
@@ -223,6 +234,7 @@ export const Message = (props)=>{
                             <div>{friendReaction}</div>
                         </div>
                     </div>
+
                 </div>
                 <dialog ref={reportWindow} className='reportWindow'>
                     {reportWasFiled&&

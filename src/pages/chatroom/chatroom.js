@@ -226,6 +226,7 @@ const Chatroom = ()=>{
         const handleScroll = () => {
             setScrolledToBottom(isScrolledToBottom())
         }
+        
         if(!chatroomRef.current)return
         chatroomRef.current.addEventListener('scroll', handleScroll);
 
@@ -233,15 +234,22 @@ const Chatroom = ()=>{
             if(!chatroomRef.current)return
             chatroomRef.current.removeEventListener('scroll', handleScroll);
         };
-    }, [])
+    }, [chatroomRef.current])
 
     useEffect(() => {
+        /* This useEffect hook makes sure that the users are 
+        scrolled all the way to the bottom when the component
+        loads */
         if (!chatroomRef.current||!messages[0])return
         messages.sort((a, b) => a.dateCreated - b.dateCreated);
         if(receivedMessages.length>2)return
+        /* once the snapshot for the user's messages is in place,
+        it will push the string "user message received" to this 
+        receivedMessages array. And same thing for the friend's messages.
+        This ensures that the initial scroll only happens once the previous
+        messages are all setup. */
         chatroomRef.current.scrollTop = chatroomRef.current.scrollHeight;
-        console.log('bug')
-      }, [existentIDs,messages]);
+      }, [receivedMessages,messages]);
 
     const sendMessage = async(text)=>{
         const messageID = generateRandomKey(20)
@@ -324,6 +332,12 @@ const Chatroom = ()=>{
         {(IDisRight&&user&&!friendNameError)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
                 <p>{JSON.stringify(unreadMessages)}</p>
+                <button onClick={()=>{
+                    console.log(scrolledToBottom)
+                }}>scrolled to bottom</button>
+                <button onClick={()=>{
+                    console.log(chatroomRef.current)
+                }}>chatroom?</button>
                 <div className="chatHeader flexLeft redBG">
                     <Link to={'/chat'}> <House></House> </Link>
                     <div className="vl"></div>
