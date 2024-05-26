@@ -23,6 +23,7 @@ const Chatroom = ()=>{
     const [friendName, setFriendName] = useState(null)    
     const [friendOffline, setFriendOffline] = useState(false)
     const existentIDs = new Set();
+    const unReadMessages = new Set();
     
     const chatroomRef = useRef(null)
     const messageInputRef = useRef(null)
@@ -129,7 +130,8 @@ const Chatroom = ()=>{
         const scrollTop = chatroomRef.current.scrollTop;
         const scrollHeight = chatroomRef.current.scrollHeight;
         const clientHeight = chatroomRef.current.clientHeight;
-      
+        if(scrollHeight===clientHeight)return true
+        
         // Check if scrolled to the bottom considering potential content padding
         return scrollTop + clientHeight >= scrollHeight;
     }
@@ -217,29 +219,28 @@ const Chatroom = ()=>{
     },[user])
     
     const [receivedMessages, setReceivedMessages] = useState([])
+    const [scrolledToBottom,setScrolledToBottom] = useState(true)
+    const [unreadMessages,setUnreadMessages] = useState([])
 
-    const [scrolledToBottom,setScrolledToBottom] = useState(false)
     useEffect(() => {
         const handleScroll = () => {
-            if(!isScrolledToBottom()){
-                setScrolledToBottom(false)
-            }
-            else{
-                setScrolledToBottom(true)
-            }
+            setScrolledToBottom(isScrolledToBottom())
         }
-        document.addEventListener('scroll', handleScroll);
+        if(!chatroomRef.current)return
+        chatroomRef.current.addEventListener('scroll', handleScroll);
 
         return () => {
-          document.removeEventListener('scroll', handleScroll);
+            if(!chatroomRef.current)return
+            chatroomRef.current.removeEventListener('scroll', handleScroll);
         };
-      }, [])
+    }, [])
 
     useEffect(() => {
         if (!chatroomRef.current||!messages[0])return
         messages.sort((a, b) => a.dateCreated - b.dateCreated);
         if(receivedMessages.length>2)return
         chatroomRef.current.scrollTop = chatroomRef.current.scrollHeight;
+        console.log('bug')
       }, [existentIDs,messages]);
 
     const sendMessage = async(text)=>{
@@ -295,7 +296,9 @@ const Chatroom = ()=>{
         friendID:friendID,
         generateRandomKey:generateRandomKey,
         chatroomRef:chatroomRef,
-        scrolledToBottom:scrolledToBottom
+        scrolledToBottom:scrolledToBottom,
+        unreadMessages:unreadMessages,
+        setUnreadMessages:setUnreadMessages
         
         /* this information has to be communicated to the MessagesList component
         through a context provider */
@@ -320,15 +323,7 @@ const Chatroom = ()=>{
         
         {(IDisRight&&user&&!friendNameError)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
-                <button onClick={()=>{
-                    console.log(chatroomRef.current.scrollTop)
-                }}>scroll top</button>
-                <button onClick={()=>{
-                    console.log(chatroomRef.current.scrollHeight)
-                }}>scroll height</button>
-                <button onClick={()=>{
-                    console.log(chatroomRef.current.clientHeight)
-                }}>client height</button>
+                <p>{JSON.stringify(unreadMessages)}</p>
                 <div className="chatHeader flexLeft redBG">
                     <Link to={'/chat'}> <House></House> </Link>
                     <div className="vl"></div>
@@ -336,12 +331,15 @@ const Chatroom = ()=>{
                         You are speaking to {friendName} 
                         {friendOffline&& " (user disconnected)"}
                      </h2>
-                     {/* {unreadMessages.length>1&& 
-                        <div className="notificationContainer">
+                     {unreadMessages.length>=1&& 
+                        <div className="notificationContainer"
+                             onClick={()=>{
+                                scrollToBottom(chatroomRef.current)
+                             }}>
                             <div className="notification whiteText">
                                 {unreadMessages.length} unread messages
                             </div>
-                        </div>} */}
+                        </div>}
                 </div>
                     <div ref={chatroomRef}  className="chatroom" id="chatroom">
                         <ChatroomContext.Provider value={chatroomContextVal}>

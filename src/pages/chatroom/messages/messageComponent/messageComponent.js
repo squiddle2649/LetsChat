@@ -33,6 +33,10 @@ export const Message = (props)=>{
     const generateRandomKey = chatroomContext.generateRandomKey
     const chatroomRef = chatroomContext.chatroomRef
     const scrolledToBottom = chatroomContext.scrolledToBottom
+    const unreadMessages = chatroomContext.unreadMessages
+    const setUnreadMessages = chatroomContext.setUnreadMessages
+    const unreadSet = new Set();
+    
 
     const senderID = me?user.uid:friendID
     const messageReactionRef =ref(database,`Users/${senderID}/CurrentConversation/Messages/${messageID}`)
@@ -52,34 +56,44 @@ export const Message = (props)=>{
         setReportWasFiled(false)
     }
 
-    const isOverflowing = ()=>{
-        const chatroomRect = chatroomRef.current.getBoundingClientRect()
-        const messageRect = messageElement.current.getBoundingClientRect()
-        const overflowing = chatroomRect.bottom<messageRect.top
-        return overflowing
-    }
-
-    const isScrolledToBottom=()=> {
-        if (!chatroomRef.current) return false; // Handle missing ref
-      
-        const scrollTop = chatroomRef.current.scrollTop;
-        const scrollHeight = chatroomRef.current.scrollHeight;
-        const clientHeight = chatroomRef.current.clientHeight;
-      
-        // Check if scrolled to the bottom considering potential content padding
-        return scrollTop + clientHeight >= scrollHeight;
-      }
-
     useEffect(()=>{
         const senderIsFriend = senderID===friendID
-
-        console.log(`isAtBottom: ${scrolledToBottom}`)
-        console.log(`senderIsFriend: ${senderIsFriend}`)
-        if(senderIsFriend&&!scrolledToBottom)return
-        
+        if(senderIsFriend&&!scrolledToBottom){
+            if(unreadSet.has(messageID))return
+            setUnreadMessages(prevMessages => [...prevMessages,messageID])
+            unreadSet.add(messageID)
+            return
+        }
         chatroomRef.current.scrollTop = chatroomRef.current.scrollHeight
         
     },[])
+
+    const isChildOverflowing = () =>{
+        if (!chatroomRef.current || !messageElement.current) return false; // Handle missing refs
+      
+        const parentRect = chatroomRef.current.getBoundingClientRect();
+        const childRect = messageElement.current.getBoundingClientRect();
+      
+        // Check if the bottom edge of the child extends below the bottom edge of the parent
+        return childRect.top > parentRect.bottom;
+      }
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if(isChildOverflowing())return
+            const newUnreadMessages = 
+                unreadMessages.filter(item => item !== messageID);
+            setUnreadMessages(newUnreadMessages);
+            
+        }
+        if(!chatroomRef.current)return
+        chatroomRef.current.addEventListener('scroll', handleScroll);
+
+        return () => {
+            if(!chatroomRef.current)return
+            chatroomRef.current.removeEventListener('scroll', handleScroll);
+        };
+    }, [])
 
     const addAreaction = async(reaction)=>{
         try{
@@ -176,14 +190,15 @@ export const Message = (props)=>{
                     if(showMenu)return
                     setHoveringMessage(false)
                 }}   
-            >  
+            >
                 <div className="flexColumn" style={{width:"100%"}}>
                     {!props.continuousSender&& 
                         <h3 className=" arial-bold" style={usernameStyle}>
                             {props.username}
                         </h3>}
                     <h3 className="messageText blackText" 
-                        style={{backgroundColor:hoveringMessage?"rgb(234, 234, 234)":""}}>
+                        style={{
+                            backgroundColor:hoveringMessage?"rgb(234, 234, 234)":"",}}>
                         <div style={{
                                 visibility:hoveringMessage?"":"hidden",
                                 display:"flex",

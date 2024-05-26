@@ -11,10 +11,8 @@
     position:relative;
     overflow: auto;
     height: 69%;
-    /* width:80%; */
     width: var(--chatroomWidth);
     word-break: break-word;
-    /* border-radius: 15px; */
     border-left: 2px solid black;
     border-right: 2px solid black;
 }
@@ -34,6 +32,7 @@
 .formContainer{
     width: 100%;
     margin-bottom: 30px;
+    z-index:6
 }
 .messageForm{
     height: 55px;
