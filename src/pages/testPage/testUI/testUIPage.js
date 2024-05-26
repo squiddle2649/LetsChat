@@ -1,25 +1,25 @@
 import './testUIStyling.css'
 import React, {useState,useEffect,useContext, useRef } from 'react';
+import { Logo } from 'components/logo/logo';
+import { Link } from 'react-router-dom';
 
 export const TestUI = ()=>{
-    const box = useRef(null)
-    useEffect(()=>{
-        if(!box.current)return
-        box.current.scrollTop = box.current.scrollHeight
-    },[])
-
-    return <div className='pageContainer flexCenter'>
-        <div ref={box} className="box">
-            <h1>you</h1>
-            <h1>are</h1>
-            <h1>my</h1>
-            <h1>body</h1>
-            <h1>the</h1>
-            <h1>one</h1>
-            <h1>desire</h1>
-            <h1>to me</h1>
-            <h1>when I</h1>
-            <h1>say</h1>
+    const logoStyle = {
+        position:'absolute',
+        top:"30px",
+        left:'30px'
+    }
+    return <div className='arial flexCenter flexColumn errorPageContainer'>
+        <div style={logoStyle}>
+            <Link to="/chat">
+                <Logo></Logo>
+            </Link>
         </div>
+        <div className="flexCenter" >
+            <h1 style={{marginBottom:"0"}}>🙃</h1>
+            <h2 style={{marginBottom:"0"}}>Whoops…something's gone wrong</h2>
+        </div>
+        <h3>Please try reloading the page. If this error persists, try again later.</h3>
+        <Link to={"/chat"}><h3>Take me home</h3></Link>
     </div>
 }

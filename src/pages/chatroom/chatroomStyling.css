@@ -99,6 +99,13 @@
 .errorPageContainer{
     height: 100vh;
 }
+.errorPage{
+    width:fit-content;
+    height:fit-content;
+    border: 1px solid black;
+    padding: 20px;
+    border-radius: 10px;
+}
 
 .sendButton{
     height: fit-content;
