@@ -23,7 +23,6 @@ const Chatroom = ()=>{
     const [friendName, setFriendName] = useState(null)    
     const [friendOffline, setFriendOffline] = useState(false)
     const existentIDs = new Set();
-    const unReadMessages = new Set();
     
     const chatroomRef = useRef(null)
     const messageInputRef = useRef(null)
@@ -57,7 +56,7 @@ const Chatroom = ()=>{
         userError||
         !IDisRight||
         friendNameError||
-        usernameError)/* &&!friendNameSnap */
+        usernameError)
     const setupLoading = IDisRight===`loading`||loadingUser||loadingUsername||loadingSnapshotFriend||loadingFriendName
 
     useEffect(()=>{
@@ -89,10 +88,6 @@ const Chatroom = ()=>{
             setupDisconnect()
         }
     }, [user]);
-
-    // useEffect(()=>{
-    //     // console.log(JSON.stringify(friendNameSnap))
-    // },[friendNameSnap])
 
     useEffect(()=>{
         if(!user||!friendSnapshot||!usernameSnapshot)return

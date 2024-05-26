@@ -61,48 +61,25 @@ export const Message = (props)=>{
             /* first condition means that the message has come
             from the friend. If user is not scrolled to bottom, 
             that means he has not read the message, therefore
-            we push the messsage to the unreadMessages array */
+            we push this messsage to the unreadMessages array */
             if(unreadSet.has(messageID))return
             setUnreadMessages(prevMessages => [...prevMessages,messageID])
             unreadSet.add(messageID)
             return
         }
+        /* otherwise, the chatroom is scrolled to the bottom at the 
+        arrival of a new message. */
         chatroomRef.current.scrollTop = chatroomRef.current.scrollHeight
         
     },[])
 
-    const isChildOverflowing = () =>{
-        if (!chatroomRef.current || !messageElement.current) return false; // Handle missing refs
-      
-        const parentRect = chatroomRef.current.getBoundingClientRect();
-        const childRect = messageElement.current.getBoundingClientRect();
-      
-        // Check if the bottom edge of the child extends below the bottom edge of the parent
-        return childRect.top > parentRect.bottom;
-      }
-
-    useEffect(() => {
-        const handleScroll = () => {
-
-            if(isChildOverflowing())return
-            
-            if(unreadMessages.includes(messageID)){
-                const newUnreadMessages = 
-                    unreadMessages.filter(item => item !== messageID);
-                setUnreadMessages(newUnreadMessages);
-            }
-            
-            
-        }
-        if(!chatroomRef.current)return
-        chatroomRef.current.addEventListener('scroll', handleScroll);
-
-        return () => {
-            if(!chatroomRef.current)return
-            chatroomRef.current.removeEventListener('scroll', handleScroll);
-        };
-    }, [chatroomRef.current,unreadMessages])
-
+    useEffect(() => {      
+        /* if user scrolls to the bottom of chatroom, there are
+        no more unread messages. Logical, right? */
+        if(!scrolledToBottom)return
+        setUnreadMessages([])
+    }, [scrolledToBottom])
+    
     const addAreaction = async(reaction)=>{
         try{
             if(me){
@@ -139,9 +116,6 @@ export const Message = (props)=>{
         }
     },[])
 
-    // useEffect(()=>{
-    //     if(senderID===friendID)return
-    // },[])
 
     const fileReport = async()=>{
         const reportID = generateRandomKey(20)
@@ -167,7 +141,6 @@ export const Message = (props)=>{
         showModal:showReportModal,
         addAReaction:addAreaction,
         me:props.me
-
     }
     
     const userReactionStyling = {
