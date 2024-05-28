@@ -33,6 +33,8 @@ export const Message = (props)=>{
     const generateRandomKey = chatroomContext.generateRandomKey
     const chatroomRef = chatroomContext.chatroomRef
     const scrolledToBottom = chatroomContext.scrolledToBottom
+    const setSetupError = chatroomContext.setSetupError
+
     const unreadMessages = chatroomContext.unreadMessages
     const setUnreadMessages = chatroomContext.setUnreadMessages
     const unreadSet = new Set();
@@ -97,19 +99,26 @@ export const Message = (props)=>{
 
     useEffect(()=>{
         const unsubscribe = onValue(messageReactionRef,(snapshot)=>{
-            const messageData = snapshot.val()
-            if(me){
-                const friendEmoji = messageData['friendReaction']
-                setFriendReaction(friendEmoji)
-                const userEmoji = messageData['userReaction']
-                setUserReaction(userEmoji)
+            try{
+                const messageData = snapshot.val()
+                if(me){
+                    const friendEmoji = messageData['friendReaction']
+                    setFriendReaction(friendEmoji)
+                    const userEmoji = messageData['userReaction']
+                    setUserReaction(userEmoji)
+                }
+                else{
+                    const friendEmoji = messageData['userReaction']
+                    setFriendReaction(friendEmoji)
+                    const userEmoji = messageData['friendReaction']
+                    setUserReaction(userEmoji)
+                }
             }
-            else{
-                const friendEmoji = messageData['userReaction']
-                setFriendReaction(friendEmoji)
-                const userEmoji = messageData['friendReaction']
-                setUserReaction(userEmoji)
+            catch(err){
+                console.log('save 1')
+                setSetupError(true)
             }
+            
         })
         return ()=>{
             unsubscribe()

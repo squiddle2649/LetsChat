@@ -51,8 +51,7 @@ const Chatroom = ()=>{
     
     const friendNameRef = IDisRight?ref(database,`Users/${friendID}/username`):null
     const [friendNameSnap, loadingFriendName, friendNameError] = useObject(friendNameRef)
-    
-    let setupError = (friendSnapshotError||
+    const [setupError,setSetupError] = useState(friendSnapshotError||
         userError||
         !IDisRight||
         friendNameError||
@@ -108,10 +107,16 @@ const Chatroom = ()=>{
     useEffect(()=>{
         if(!IDisRight)return
         const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
-
+        
         const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
-            const friendIsOffline = snapshot.val()["userOffline"]
-            setFriendOffline(friendIsOffline)
+            try{
+                const friendIsOffline = snapshot.val()["userOffline"]
+                setFriendOffline(friendIsOffline)
+            }
+            catch(err){
+                console.log('save 2')
+                setSetupError(true)
+            }
         })
         return ()=>{
             unsubscribe()    
@@ -301,17 +306,11 @@ const Chatroom = ()=>{
         chatroomRef:chatroomRef,
         scrolledToBottom:scrolledToBottom,
         unreadMessages:unreadMessages,
-        setUnreadMessages:setUnreadMessages
+        setUnreadMessages:setUnreadMessages,
+        setSetupError:setSetupError
         
         /* this information has to be communicated to the MessagesList component
         through a context provider */
-    }
-
-    const errorCheck = ()=>{
-        console.log(`friendsnapshot error: ${friendSnapshotError}`)
-        console.log(`id correct?: ${IDisRight}`)
-        console.log(`userError: ${userError}`)
-        console.log(`friend name erro: ${friendNameError}`)
     }
 
     return <div className="chatroomContainer arial ">
@@ -326,13 +325,6 @@ const Chatroom = ()=>{
         
         {(IDisRight&&user&&!friendNameError)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
-                <p>{JSON.stringify(unreadMessages)}</p>
-                <button onClick={()=>{
-                    console.log(scrolledToBottom)
-                }}>scrolled to bottom</button>
-                <button onClick={()=>{
-                    console.log(chatroomRef.current)
-                }}>chatroom?</button>
                 <div className="chatHeader flexLeft redBG">
                     <Link to={'/chat'}> <House></House> </Link>
                     <div className="vl"></div>

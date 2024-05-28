@@ -5,18 +5,18 @@ import { ref,get,update} from 'firebase/database';
 import { database,auth } from 'firebaseConfig/firebase';
 
 const TestDB  = () => {
-    const [messageContent,setMessageContent] = useState("")
+    const [username,setUsername] = useState("")
     const userID = "9X8oqSDo3Je1iZhmuxYa2Cwnz3H3"
-    const friendID = "YzV6dl6VsdY2AACYadwJQXcHRuk2"
+    const friendID = "NAaA4WMAOxbkeTrnhLhObGgomiH3"
     const [user,loadingUser,userError] = useAuthState(auth)
 
-    const messageRef = ref(database,`Users/${friendID}/CurrentConversation/Messages/eTfgqKBTf7WBVzYO4YZH`)
+    const messageRef = ref(database,`Users/${friendID}/`)
 
-    const getMessage = async()=>{
+    const getUserName = async()=>{
         try{
-            const messageSnapshot = await get(messageRef)
-            const message = messageSnapshot.val()['content']
-            setMessageContent(JSON.stringify(message))
+            const user = await get(messageRef)
+            const message = user.val()['username']
+            setUsername(JSON.stringify(message))
         }
         catch(err){
             alert(err.message)
@@ -32,14 +32,14 @@ const TestDB  = () => {
     }
 
     return <div>
-        <h2>Message:</h2>
-        <h3>{messageContent}</h3>
+        <h2>Username:</h2>
+        <h3>{username}</h3>
         <button 
             style={{
             marginTop:"100px"
         }}
-            onClick={getMessage}
-        >get message yo</button>
+            onClick={getUserName}
+        >get user yo</button>
         <button 
             style={{
             marginTop:"100px"
