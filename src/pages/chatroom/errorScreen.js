@@ -6,9 +6,9 @@ export const ErrorScreen = ()=>{
     const logoStyle = {
         position:'absolute',
         top:"30px",
-        left:'30px'
+        left:'30px',
     }
-    return <div className='arial errorPageContainer flexCenter'>
+    return <div className='errorPageContainer flexCenter'>
         <div className="errorPage flexCenter flexColumn">
             <div style={logoStyle}>
                 <Link to="/chat">

@@ -4,7 +4,7 @@ import HomePage from 'pages/homePage/homePage';
 import Chatroom from 'pages/chatroom/chatroom';
 import { BrowserRouter as Router, Route,Routes } from 'react-router-dom';
 import { TestUI } from 'pages/testPage/testUI/testUIPage';
-import TestDB from 'pages/testPage/testDB/DBtestPage';
+import TestDB from 'pages/testPage/testDB/testDBPage';
 import ContactPage from 'pages/contactPage/contactPage';
 
 import {auth} from 'firebaseConfig/firebase'

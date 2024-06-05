@@ -33,15 +33,14 @@ export const Message = (props)=>{
     const generateRandomKey = chatroomContext.generateRandomKey
     const chatroomRef = chatroomContext.chatroomRef
     const scrolledToBottom = chatroomContext.scrolledToBottom
-    const setSetupError = chatroomContext.setSetupError
-
+    const convoID = chatroomContext.convoID
     const unreadMessages = chatroomContext.unreadMessages
     const setUnreadMessages = chatroomContext.setUnreadMessages
     const unreadSet = new Set();
     
 
     const senderID = me?user.uid:friendID
-    const messageReactionRef =ref(database,`Users/${senderID}/CurrentConversation/Messages/${messageID}`)
+    const messageReactionRef =ref(database,`Conversations/${convoID}/${senderID}/Messages/${messageID}`)
 
     const usernameStyle= {
         color: me?"#277ab9":"#cd4e67",
@@ -99,25 +98,22 @@ export const Message = (props)=>{
 
     useEffect(()=>{
         const unsubscribe = onValue(messageReactionRef,(snapshot)=>{
-            try{
-                const messageData = snapshot.val()
-                if(me){
-                    const friendEmoji = messageData['friendReaction']
-                    setFriendReaction(friendEmoji)
-                    const userEmoji = messageData['userReaction']
-                    setUserReaction(userEmoji)
-                }
-                else{
-                    const friendEmoji = messageData['userReaction']
-                    setFriendReaction(friendEmoji)
-                    const userEmoji = messageData['friendReaction']
-                    setUserReaction(userEmoji)
-                }
+            
+            const messageData = snapshot.val()
+            if(!snapshot.exists())return
+            if(me){
+                const friendEmoji = messageData['friendReaction']
+                setFriendReaction(friendEmoji)
+                const userEmoji = messageData['userReaction']
+                setUserReaction(userEmoji)
             }
-            catch(err){
-                console.log('save 1')
-                setSetupError(true)
+            else{
+                const friendEmoji = messageData['userReaction']
+                setFriendReaction(friendEmoji)
+                const userEmoji = messageData['friendReaction']
+                setUserReaction(userEmoji)
             }
+
             
         })
         return ()=>{
@@ -172,7 +168,7 @@ export const Message = (props)=>{
     }
 
     return <div ref={messageElement}
-                className="arial flexRow messageContainer" 
+                className="flexRow messageContainer" 
                 onMouseEnter={()=>{
                     setHoveringMessage(true)
                 }}
@@ -183,7 +179,7 @@ export const Message = (props)=>{
             >
                 <div className="flexColumn" style={{width:"100%"}}>
                     {!props.continuousSender&& 
-                        <h3 className=" arial-bold" style={usernameStyle}>
+                        <h3 className=" " style={usernameStyle}>
                             {props.username}
                         </h3>}
                     <h3 className="messageText blackText" 
@@ -230,7 +226,7 @@ export const Message = (props)=>{
                         <div>
                             <h1>Report Message</h1>
                             <div className='badMessageDisplay flexColumn'>
-                                <p className=" arial-bold" style={usernameStyle}>
+                                <p style={usernameStyle}>
                                     {props.username}
                                 </p>
                                 <h3 className="messageText blackText" style={{margin:"0"}}>{props.content}</h3>
@@ -241,7 +237,7 @@ export const Message = (props)=>{
                                     fileReport()
                                 }}>
                                     <label>Please describe the problem</label>
-                                    <input className='arial reportInput' onChange={(e)=>{
+                                    <input className='reportInput' onChange={(e)=>{
                                         setReportText(e.target.value)
                                     }}
                                     // required

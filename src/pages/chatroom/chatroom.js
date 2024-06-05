@@ -15,8 +15,6 @@ export const ChatroomContext = createContext()
 
 const Chatroom = ()=>{
     const {friendID} = useParams()
-    const [IDisRight, setIDisRight] = useState(true)
-    const [user,loadingUser,userError] = useAuthState(auth)
     const [messages,setMessages] = useState([])
     const [currentMessage, setCurrentMessage] = useState("")
     const [username, setUsername] = useState(null)    
@@ -28,100 +26,126 @@ const Chatroom = ()=>{
     const messageInputRef = useRef(null)
 
     const scrollToBottom = (element)=>{
-        if(user&&IDisRight)
         element.scrollTo({
             top:element.scrollHeight,
             left: 0,
         })
     }
-    const usernameRef = 
-        user?ref( database,`Users/${user.uid}/username`):null
+    const scrambleStrings = (str1, str2) =>{
+        
+        /* This function scrambles two strings in a specific way to produce a consistent output.
+      
+        Args:
+            str1: The first string to be scrambled.
+            str2: The second string to be scrambled.
+      
+        Returns:
+            A string representing the scrambled combination of the two inputs. */
+        
+      
+        // Combine the strings
+        const combinedString = str1 + str2;
+      
+        // Sort the characters
+        const sortedChars = combinedString.split("").sort();
+      
+        // Interleave characters from each string
+        let scrambledString = "";
+        for (let i = 0; i < combinedString.length; i++) {
+          if (i % 2 === 0) {
+            scrambledString += sortedChars[Math.floor(i / 2)];
+          } else {
+            scrambledString += sortedChars[Math.floor(combinedString.length / 2) + Math.floor(i / 2)];
+          }
+        }
+      
+        return scrambledString;
+    }
+    
+
+    const [user,loadingUser,userError] = useAuthState(auth)
+
+    const convoID = user?scrambleStrings(user.uid,friendID):null
+
+    useEffect(()=>{
+        if(!user)return
+        const markConvo = async()=>{
+            const currentConvoRef = ref(database,`Users/${user.uid}`)
+            try{
+                await update(currentConvoRef,{currentConversation:convoID})
+            }
+            catch(err){
+                console.log(err.message)
+            }
+        }
+        return()=>{
+            markConvo()
+        }
+    },[user])
+
+    const usernameRef = user?ref( database,`Conversations/${convoID}/${user.uid}/username`):null
     const [usernameSnapshot,loadingUsername,usernameError] = 
     useObject(usernameRef)
 
-    const conversationPartnerRef = 
-        user?ref( database,`Users/${user.uid}/CurrentConversation/friend`):null
-        /* here we are getting the ID of the conversation partner in the user's
-        'CurrentConversation' collection to make sure that he is the same as the
-        friendID from the URL. If it isn't, then we will have to throw an error. */
-
-    const [friendSnapshot,loadingSnapshotFriend,friendSnapshotError] = 
-    useObject(conversationPartnerRef)
-    
-    
-    const friendNameRef = IDisRight?ref(database,`Users/${friendID}/username`):null
+    const friendNameRef = ref( database,`Conversations/${convoID}/${friendID}/username`)
     const [friendNameSnap, loadingFriendName, friendNameError] = useObject(friendNameRef)
-    const [setupError,setSetupError] = useState(friendSnapshotError||
-        userError||
-        !IDisRight||
-        friendNameError||
-        usernameError)
-    const setupLoading = IDisRight===`loading`||loadingUser||loadingUsername||loadingSnapshotFriend||loadingFriendName
+
+    const [mistake, setMistake] = useState(false)
+    const [setupError,setSetupError] = useState(false)
+
+    const [loading,setLoading] = useState(true)
+
+    const [ready, setReady] = useState(false)
 
     useEffect(()=>{
-        if(!IDisRight||!friendNameSnap)return
-        setFriendName(friendNameSnap.val())
-    },[IDisRight,friendNameSnap])
-
-    const [mesagesReceived, setMessagesReceived] = []
-
-    const setOnline = async(ref)=>{
+        if(!friendNameSnap||!usernameSnapshot){
+            setMistake(true)
+            return
+        }
         try{
-            await update(ref,{userOffline:false})
+            if(friendNameSnap.exists()&&usernameSnapshot.exists()){
+                setFriendName(friendNameSnap.val())
+                setUsername(usernameSnapshot.val())
+                console.log('success')
+                setMistake(false)
+            }
+            else{
+                console.log("there is a mistake")
+                setMistake(true)
+            }
         }
         catch(err){
-            alert(err.message)
+            console.log(err.message)
+            setMistake(true)
+            
         }
-    }
+        finally{
+            setLoading(loadingUsername||
+                loadingFriendName||
+                loadingUser)
+            setSetupError(userError||
+                friendNameError||
+                usernameError||mistake)
+            setReady(!setupError&&!loading)
+        }
+    },[friendNameSnap,usernameSnapshot,ready,setupError,loading,mistake])
 
-    useEffect(()=>{
-        const setupDisconnect = ()=>{
-            if(!user)return
-            const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
-            onDisconnect(currentConversation).update({userOffline:true})
-            /* remove currentConversation subcollection from the user's document
-            when he disconnects. */
-        }
+    // useEffect(()=>{
+    //     const friendRef = ref(database, `Conversations/${convoID}/${friendID}`)
         
-        return ()=>{
-            setupDisconnect()
-        }
-    }, [user]);
-
-    useEffect(()=>{
-        if(!user||!friendSnapshot||!usernameSnapshot)return
-        /* If the user or the friendsnapshot isn't ready, then just return */
-        /* REMEMBER: FriendSnapshot is the ID of the friend written in the
-        user's own CurrentConversation collection */
-        setUsername(usernameSnapshot.val())
-        setIDisRight(friendSnapshot.val()===friendID)
-        const currentConversation = ref(database,`Users/${user.uid}/CurrentConversation`)
-        if(IDisRight){
-            setOnline(currentConversation)
-        }
-
-        //verifying that the ID in the URL really is the friend's ID.
-    },[user,friendSnapshot,usernameSnapshot])
-
-
-    useEffect(()=>{
-        if(!IDisRight)return
-        const friendConvoRef = ref(database, `Users/${friendID}/CurrentConversation`)
-        
-        const unsubscribe = onValue(friendConvoRef,(snapshot)=>{
-            try{
-                const friendIsOffline = snapshot.val()["userOffline"]
-                setFriendOffline(friendIsOffline)
-            }
-            catch(err){
-                console.log('save 2')
-                setSetupError(true)
-            }
-        })
-        return ()=>{
-            unsubscribe()    
-        }
-    },[])
+    //     const unsubscribe = onValue(friendRef,(snapshot)=>{
+    //         try{
+    //             const friendIsOffline = snapshot.val()["userOffline"]
+    //             setFriendOffline(friendIsOffline)
+    //         }
+    //         catch(err){
+    //             alert(err.message)
+    //         }
+    //     })
+    //     return ()=>{
+    //         unsubscribe()    
+    //     }
+    // },[])
 
     const isScrolledToBottom = () => {
 
@@ -137,7 +161,7 @@ const Chatroom = ()=>{
     }
 
     useEffect(()=>{ /* get data from friend's message */
-        const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
+        const friendMessagesRef = ref(database, `Conversations/${convoID}/${friendID}/Messages`)
         const unsubscribe = onValue(friendMessagesRef,(messageSnapshot)=>{
             if(!messageSnapshot.exists()){
                 setReceivedMessages(prevMessages => [...prevMessages,"friend"])
@@ -186,35 +210,35 @@ const Chatroom = ()=>{
         return()=>{
             unsubscribe() 
         }
-    },[])
-
-    useEffect(()=>{ /* loading the user's own messages */
+    },[friendNameSnap])
+    useEffect(()=>{ /* get user's own messages */
         if(!user)return
-        const userMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages`)
-        const unsubscribe=onValue(userMessagesRef,(messageSnapshot)=>{
+
+        const userMessagesRef = ref(database, `Conversations/${convoID}/${user.uid}/Messages`)
+        const unsubscribe = onValue(userMessagesRef,(messageSnapshot)=>{
             if(!messageSnapshot.exists()){
-                setReceivedMessages(prevMessages => [...prevMessages,"user"])    
+                setReceivedMessages(prevMessages => [...prevMessages,"user"])
                 return
             }
             const messagesData = messageSnapshot.val()
             const messageIDs = Object.keys(messagesData)
-
+            
             const messagesArray = messageIDs.map(key => ({
                 id: key,
                 dateCreated: messagesData[key].dateCreated,
                 content: messagesData[key].content,
                 sender:user.uid
-            }));
-            
+              }));
+
             messagesArray.forEach((message)=>{
                 if(existentIDs.has(message.id))return
                 setMessages(prevMessages => [...prevMessages,message])
                 existentIDs.add(message.id)
             }) 
-            setReceivedMessages(prevMessages => [...prevMessages,"user"])    
+            setReceivedMessages(prevMessages => [...prevMessages,"user"])
         })
         return()=>{
-            unsubscribe()
+            unsubscribe() 
         }
     },[user])
     
@@ -242,6 +266,7 @@ const Chatroom = ()=>{
         loads */
         if (!chatroomRef.current||!messages[0])return
         messages.sort((a, b) => a.dateCreated - b.dateCreated);
+        console.log("123456")
         if(receivedMessages.length>2)return
         /* once the snapshot for the user's messages is in place,
         it will push the string "user message received" to this 
@@ -253,17 +278,18 @@ const Chatroom = ()=>{
 
     const sendMessage = async(text)=>{
         const messageID = generateRandomKey(20)
-        const userMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages/${messageID}`)
+        const messagesRef = ref(database, `Conversations/${convoID}/${user.uid}/Messages/${messageID}`)
         const currentDate = new Date()
         const messageObject = {
             dateCreated:currentDate.getTime(),
             content:text,
+            sender:user.uid
           }
         /* this is the message document that will be added to the messages
         collection (userMessagesRef). This doesn't have the attribute ID
         because the document itself is an ID */
         try{
-            await set(userMessagesRef,messageObject)  
+            await set(messagesRef,messageObject)  
         }
         catch(err){
             alert(err.message)
@@ -307,23 +333,26 @@ const Chatroom = ()=>{
         scrolledToBottom:scrolledToBottom,
         unreadMessages:unreadMessages,
         setUnreadMessages:setUnreadMessages,
-        setSetupError:setSetupError
+        convoID:convoID
         
         /* this information has to be communicated to the MessagesList component
         through a context provider */
     }
 
     return <div className="chatroomContainer arial ">
-        {(setupLoading)&&
+        {(loading)&&
             <LoadingScreen></LoadingScreen>
+    
         }
-        {setupError&& 
+        {(setupError)&& 
         /* the variable friendSnapshotError means something is wrong with the path 
         'Users/user.uid/CurrentConversation/friend'*/
-            <ErrorScreen></ErrorScreen>
+            <div>
+                <ErrorScreen></ErrorScreen>
+            </div>
         }
         
-        {(IDisRight&&user&&!friendNameError)&&
+        {(ready)&&
             <div style={{height:"100%",width:"100%"}} className="flexCenter flexColumn">
                 <div className="chatHeader flexLeft redBG">
                     <Link to={'/chat'}> <House></House> </Link>

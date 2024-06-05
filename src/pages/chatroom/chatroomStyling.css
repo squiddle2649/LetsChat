@@ -1,9 +1,12 @@
 #root{
-    --chatroomWidth:95%;    
+    --chatroomWidth:100%;    
+}
+body{
+    margin:0
 }
 
 .chatroomContainer{
-    height: 100vh;
+    height: 100%;
     margin: 0;
     padding: 0;
 }
@@ -13,7 +16,7 @@
     scroll-behavior: smooth;
 
     /* overflow: visible; */
-    height: 69%;
+    height: 100%;
     width: var(--chatroomWidth);
     word-break: break-word;
     border-left: 2px solid black;
@@ -34,18 +37,13 @@
 }
 .formContainer{
     width: 100%;
-    margin-bottom: 30px;
     z-index:6
 }
 .messageForm{
     height: 55px;
     display: flex;
     width: var(--chatroomWidth);
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-    border:2px solid black
+    border-top:2px solid black
 }
 
 .darker{
@@ -75,12 +73,7 @@
 .chatHeader{
     position: relative;
     width: var(--chatroomWidth);
-    /* margin-bottom: 10px; */
-    border-top-left-radius: 15px; 
-    border-top-right-radius: 15px;
-    border-bottom-left-radius: 0; 
-    border-bottom-right-radius: 0;
-    border: 2px solid #222828;
+    border-bottom: 2px solid #222828;
 }
 .vl{
     height: 100%;
@@ -102,9 +95,6 @@
 .errorPage{
     width:fit-content;
     height:fit-content;
-    border: 1px solid black;
-    padding: 20px;
-    border-radius: 10px;
 }
 
 .sendButton{

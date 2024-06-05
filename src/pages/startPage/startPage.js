@@ -72,7 +72,7 @@ const StartPage = () =>{
             signIn()
         }}>
             <div className='formComponents'>
-                <label><h1 className='tight arial-bold'>👋 Hi, my name is </h1></label>
+                <label><h1 className='arial-bold'>👋 Hi, my name is </h1></label>
                 <input className='nameInput' required type="text"  onChange={(e)=>{
                     setUsername(e.target.value)
                 }}></input>

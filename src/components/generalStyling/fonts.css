@@ -38,7 +38,7 @@
 }
 
 .arial{
-    font-family: arial;
+    font-family: Arial, Helvetica, sans-serif;
 }
 .arial-black{
     font-family: arial-black;
@@ -58,7 +58,9 @@
 .arial-narrow{
     font-family: arial-narrow;
 }
-
+.boldy{
+    font-weight:900;
+}
 .tight{
     letter-spacing:-1.4px;
 }
