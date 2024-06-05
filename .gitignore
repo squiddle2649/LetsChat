@@ -7,7 +7,7 @@
 
 # testing
 /coverage
-
+/pages/testPage/testUI
 # production
 /build
 text.txt
