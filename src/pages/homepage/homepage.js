@@ -65,7 +65,7 @@ const HomePage = ()=>{
             */
             setInQueue(true)
             const ongoingConvoID = ongoingConvoSnap.val()
-            const convoRef = ref(database,`Conversations/${ongoingConvoID}/${user.uid}`)
+            const convoRef = ref(database,`Conversations/${ongoingConvoID}`)
             await remove(convoRef)    
             console.log('lets remove the conversation!')
         }
@@ -205,12 +205,12 @@ const HomePage = ()=>{
         return result;
     }
 
-    return <div className='homePageContainer flexCenter '>
+    return <div className='homePageContainer flexCenter nunito-sans-regular'>
         {(loadingSetup)&& <LoadingScreen></LoadingScreen> }
         {(errorUser||snapshotError)&&<p>
             Looks like something went wrong. Try refreshing the page.</p>}
         {(nogo&&!loadingSetup)&& 
-            <section className='flexCenter flexColumn arial'>
+            <section className='flexCenter flexColumn'>
                 <h2 >Looks like you're not signed in</h2>
                 <Link to="/">
                     <h3>Return to start page</h3>
@@ -219,21 +219,21 @@ const HomePage = ()=>{
         }
         {(snapshot&&user)&&
         <div className='flexColumn flexCenter classy'>
-            <h1 className='welcomeText arial'><i>Welcome, {username}</i></h1>
+            <h1 className='welcomeText '><i>Welcome, {username}</i></h1>
     
             {/* 1. If user is in the queue, he will be given an option to exit it.
                 2. if he is not in the queue, he will be given an option to enter */}
             {inQueue?
             <div className='flexColumn flexCenter'>
-                <p className='arial searchingText'>Finding someone for you…</p>
+                <p className=' searchingText'>Finding someone for you…</p>
                 <button className ="startChatBtn redBGhover noBorder pointer whiteText " onClick={exitQueue}>
-                    <h2 className="arial">Cancel</h2>
+                    <h2 className="">Cancel</h2>
                 </button>
             </div>
             :
             <div>
                 <button className='startChatBtn redBGhover noBorder pointer whiteText' onClick={enterQueue}>
-                    <h2 className='arial'>Start chatting</h2>
+                    <h2 className=''>Start chatting</h2>
                 </button>
             </div>
             }
@@ -245,9 +245,9 @@ const HomePage = ()=>{
             ></Header>
             <div className='disclaimerContainer flexCenter flexColumn'>
                 <Link to={"/contact"}>
-                    <h2 style={feedbackRequestStyle} className="arial">GIVE ME FEEDBACK</h2>
+                    <h2 style={feedbackRequestStyle} className="">GIVE ME FEEDBACK</h2>
                 </Link>
-                <p className='disclaimer arial'>
+                <p className='disclaimer '>
                     The owner of this site is not responsible for any user generated content (messages, usernames)
                 </p>
             </div>
@@ -258,7 +258,7 @@ const HomePage = ()=>{
 }
 const Header = (props)=>{
 
-    return <div className='headerContainer'>
+    return <div className='headerContainer '>
         <div className='logoContainer'>
                 <Logo></Logo>
             </div>
@@ -271,7 +271,7 @@ const Header = (props)=>{
             }}>
                 <SignOutArrow></SignOutArrow>
             </button>
-            <h3 className='arial'>Sign out</h3>
+            <h3 >Sign out</h3>
         </div>
     </div>
 }

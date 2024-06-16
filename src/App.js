@@ -10,7 +10,7 @@ import ContactPage from 'pages/contactPage/contactPage';
 import {auth} from 'firebaseConfig/firebase'
 function App() {
   return (
-    <Router>
+    <Router >
       <Routes>
       <Route path="/" element={<StartPage></StartPage>}/>        
       <Route path="/chat" element={<HomePage></HomePage>}/>        

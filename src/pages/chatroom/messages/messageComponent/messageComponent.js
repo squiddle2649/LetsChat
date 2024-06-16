@@ -34,18 +34,16 @@ export const Message = (props)=>{
     const chatroomRef = chatroomContext.chatroomRef
     const scrolledToBottom = chatroomContext.scrolledToBottom
     const convoID = chatroomContext.convoID
-    const unreadMessages = chatroomContext.unreadMessages
     const setUnreadMessages = chatroomContext.setUnreadMessages
     const unreadSet = new Set();
-    
 
     const senderID = me?user.uid:friendID
-    const messageReactionRef =ref(database,`Conversations/${convoID}/${senderID}/Messages/${messageID}`)
+    const messageReactionRef =ref(database,`Conversations/${convoID}/Messages/${messageID}`)
 
     const usernameStyle= {
         color: me?"#277ab9":"#cd4e67",
         marginBottom:'0',
-        marginTop:"15px",
+        marginTop:props.replying?"0":"15px",
         marginLeft:"35px"
     }   
 
@@ -121,7 +119,6 @@ export const Message = (props)=>{
         }
     },[])
 
-
     const fileReport = async()=>{
         const reportID = generateRandomKey(20)
         const reportRef = ref(database,`Reports/${reportID}`)
@@ -145,7 +142,9 @@ export const Message = (props)=>{
     const messageContextVal = {
         showModal:showReportModal,
         addAReaction:addAreaction,
-        me:props.me
+        me:props.me,
+        messageID:messageID,
+        content:props.content
     }
     
     const userReactionStyling = {
@@ -177,14 +176,28 @@ export const Message = (props)=>{
                     setHoveringMessage(false)
                 }}   
             >
+
                 <div className="flexColumn" style={{width:"100%"}}>
+                    {props.replying&&<div className='line'>
+                        <div className='replyInfo'>
+                            <div style={{
+                                    color: props.replying.senderName===props.username?"#277ab9":"#cd4e67",
+                                    marginRight:"10px"
+                                }}>
+                                <strong>{props.replying.senderName}</strong>
+                            </div>
+                            <div>
+                                {props.replying.content}
+                            </div>
+                        </div>
+                    </div>}
                     {!props.continuousSender&& 
                         <h3 className=" " style={usernameStyle}>
                             {props.username}
                         </h3>}
                     <h3 className="messageText blackText" 
                         style={{
-                            backgroundColor:hoveringMessage?"rgb(234, 234, 234)":"",}}>
+                            backgroundColor:hoveringMessage?"rgb(244, 244, 244)":"",}}>
                         <div style={{
                                 visibility:hoveringMessage?"":"hidden",
                                 display:"flex",

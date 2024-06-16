@@ -6,7 +6,7 @@ import { useAuthState } from "react-firebase-hooks/auth"
 import React, {  useState,useEffect,useRef,createContext } from 'react';
 import './chatroomStyling.css?'
 import 'components/generalStyling/main.css'
-import { House,Send} from "./chatroomSVG"
+import { House,Send,CloseSVG} from "./chatroomSVG"
 import LoadingScreen from "components/loadingScreen/loadingScreen"
 import { MessagesList } from "./messages/messagesList"
 import { ErrorScreen } from "./errorScreen"
@@ -32,18 +32,6 @@ const Chatroom = ()=>{
         })
     }
     const scrambleStrings = (str1, str2) =>{
-        
-        /* This function scrambles two strings in a specific way to produce a consistent output.
-      
-        Args:
-            str1: The first string to be scrambled.
-            str2: The second string to be scrambled.
-      
-        Returns:
-            A string representing the scrambled combination of the two inputs. */
-        
-      
-        // Combine the strings
         const combinedString = str1 + str2;
       
         // Sort the characters
@@ -71,6 +59,7 @@ const Chatroom = ()=>{
         if(!user)return
         const markConvo = async()=>{
             const currentConvoRef = ref(database,`Users/${user.uid}`)
+
             try{
                 await update(currentConvoRef,{currentConversation:convoID})
             }
@@ -130,25 +119,7 @@ const Chatroom = ()=>{
         }
     },[friendNameSnap,usernameSnapshot,ready,setupError,loading,mistake])
 
-    // useEffect(()=>{
-    //     const friendRef = ref(database, `Conversations/${convoID}/${friendID}`)
-        
-    //     const unsubscribe = onValue(friendRef,(snapshot)=>{
-    //         try{
-    //             const friendIsOffline = snapshot.val()["userOffline"]
-    //             setFriendOffline(friendIsOffline)
-    //         }
-    //         catch(err){
-    //             alert(err.message)
-    //         }
-    //     })
-    //     return ()=>{
-    //         unsubscribe()    
-    //     }
-    // },[])
-
     const isScrolledToBottom = () => {
-
         if (!chatroomRef.current) return false; // Handle missing ref
         
         const scrollTop = chatroomRef.current.scrollTop;
@@ -159,88 +130,41 @@ const Chatroom = ()=>{
         // Check if scrolled to the bottom considering potential content padding
         return scrollTop + clientHeight >= scrollHeight;
     }
+    const messagesRef = ref(database, `Conversations/${convoID}/Messages`)
+    const [messagesSnap, messagesLoading, messagesError] = useObject(messagesRef)
 
-    useEffect(()=>{ /* get data from friend's message */
-        const friendMessagesRef = ref(database, `Conversations/${convoID}/${friendID}/Messages`)
-        const unsubscribe = onValue(friendMessagesRef,(messageSnapshot)=>{
-            if(!messageSnapshot.exists()){
-                setReceivedMessages(prevMessages => [...prevMessages,"friend"])
-                return
+    useEffect(()=>{ /* get messages */
+        if(!messagesSnap||!messagesSnap.exists())return
+
+        const messagesData = messagesSnap.val()
+        /* format of messagesData:
+            {
+                "l31g41yk":{content:"hi",dateCreated:123},
+                "l31g41yk":{content:"hello",dateCreated:886},
             }
-            const messagesData = messageSnapshot.val()
-            /* format of messagesData:
-                {
-                    "l31g41yk":{content:"hi",dateCreated:123},
-                    "l31g41yk":{content:"hello",dateCreated:886},
-                }
-            */
-            const messageIDs = Object.keys(messagesData)
-            /* messageIDs is an array with the messages ID 
-            of the other user: messageIDs = ["l31g41yk","l31g41yk"] */
+        */
+        const messageIDs = Object.keys(messagesData)
+        /* messageIDs is an array with the messages ID 
+        of the other user: messageIDs = ["l31g41yk","l31g41yk"] */
+        /* 
+            [
+                {id:'elfisu',dateCreated:12},
+                {id:'almina',dateCreated:21},
+                {id:'liuse',dateCreated:2}
+            ]
+        */
+        const messagesArray = messageIDs.map(key => ({
+            id: key,
+            dateCreated: messagesData[key].dateCreated,
+            content: messagesData[key].content,
+            sender:messagesData[key].sender,
+            replying:messagesData[key].replying
+        }));
 
-            /* 
-                [
-                    {id:'elfisu',dateCreated:12},
-                    {id:'almina',dateCreated:21},
-                    {id:'liuse',dateCreated:2}
-                ]
-            */
-            const messagesArray = messageIDs.map(key => ({
-                id: key,
-                dateCreated: messagesData[key].dateCreated,
-                content: messagesData[key].content,
-                sender:friendID
-              }));
+            setMessages(messagesArray)
+        messages.sort((a, b) => a.dateCreated - b.dateCreated);
 
-
-
-            messagesArray.forEach((message)=>{
-                if(existentIDs.has(message.id))return
-                /* whenever we get the messagesArray, we get a list of all
-                the friend's messages. Some of these messages, however, are
-                already being displayed, so we add all the ids to a javascript
-                Set (which doesn't allow duplicates) and only display a message
-                if it's ID isn't already in the Set*/
-                setMessages(prevMessages => [...prevMessages,message])
-                existentIDs.add(message.id)
-            }) 
-            setReceivedMessages(prevMessages => [...prevMessages,"friend"])
-
-        })
-        return()=>{
-            unsubscribe() 
-        }
-    },[friendNameSnap])
-    useEffect(()=>{ /* get user's own messages */
-        if(!user)return
-
-        const userMessagesRef = ref(database, `Conversations/${convoID}/${user.uid}/Messages`)
-        const unsubscribe = onValue(userMessagesRef,(messageSnapshot)=>{
-            if(!messageSnapshot.exists()){
-                setReceivedMessages(prevMessages => [...prevMessages,"user"])
-                return
-            }
-            const messagesData = messageSnapshot.val()
-            const messageIDs = Object.keys(messagesData)
-            
-            const messagesArray = messageIDs.map(key => ({
-                id: key,
-                dateCreated: messagesData[key].dateCreated,
-                content: messagesData[key].content,
-                sender:user.uid
-              }));
-
-            messagesArray.forEach((message)=>{
-                if(existentIDs.has(message.id))return
-                setMessages(prevMessages => [...prevMessages,message])
-                existentIDs.add(message.id)
-            }) 
-            setReceivedMessages(prevMessages => [...prevMessages,"user"])
-        })
-        return()=>{
-            unsubscribe() 
-        }
-    },[user])
+    },[messagesSnap])
     
     const [receivedMessages, setReceivedMessages] = useState([])
     const [scrolledToBottom,setScrolledToBottom] = useState(true)
@@ -261,12 +185,11 @@ const Chatroom = ()=>{
     }, [chatroomRef.current])
 
     useEffect(() => {
+        messages.sort((a, b) => a.dateCreated - b.dateCreated);
         /* This useEffect hook makes sure that the users are 
         scrolled all the way to the bottom when the component
         loads */
         if (!chatroomRef.current||!messages[0])return
-        messages.sort((a, b) => a.dateCreated - b.dateCreated);
-        console.log("123456")
         if(receivedMessages.length>2)return
         /* once the snapshot for the user's messages is in place,
         it will push the string "user message received" to this 
@@ -278,12 +201,13 @@ const Chatroom = ()=>{
 
     const sendMessage = async(text)=>{
         const messageID = generateRandomKey(20)
-        const messagesRef = ref(database, `Conversations/${convoID}/${user.uid}/Messages/${messageID}`)
+        const messagesRef = ref(database, `Conversations/${convoID}/Messages/${messageID}`)
         const currentDate = new Date()
         const messageObject = {
             dateCreated:currentDate.getTime(),
             content:text,
-            sender:user.uid
+            sender:user.uid,
+            replying:replying
           }
         /* this is the message document that will be added to the messages
         collection (userMessagesRef). This doesn't have the attribute ID
@@ -294,24 +218,11 @@ const Chatroom = ()=>{
         catch(err){
             alert(err.message)
         }
-    }
-
-    
-
-    const resetMessages = async()=>{
-        /* This is just for convenience: sometimes when testing the code,
-        the chatroom gets full of messages and I need to just reset everything*/
-        const friendMessagesRef = ref(database, `Users/${friendID}/CurrentConversation/Messages`)
-        const myMessagesRef = ref(database, `Users/${user.uid}/CurrentConversation/Messages`)
-        try{
-            await remove(friendMessagesRef)
-            await remove(myMessagesRef)
-            setMessages([])
-        }
-        catch(err){
-            alert(err.message)
+        finally{
+            setReplying(false)
         }
     }
+
 
     const generateRandomKey=(length)=> {
         /* genearting a random ID for each message */
@@ -322,6 +233,8 @@ const Chatroom = ()=>{
         }
         return result;
     }
+    const [replying, setReplying] = useState(false)
+
     const chatroomContextVal = {
         messages:messages,
         user:user,
@@ -333,20 +246,19 @@ const Chatroom = ()=>{
         scrolledToBottom:scrolledToBottom,
         unreadMessages:unreadMessages,
         setUnreadMessages:setUnreadMessages,
-        convoID:convoID
+        convoID:convoID,
+        replying:replying,
+        setReplying:setReplying
         
         /* this information has to be communicated to the MessagesList component
         through a context provider */
     }
 
-    return <div className="chatroomContainer arial ">
+    return <div className="chatroomContainer nunito-sans-regular">
         {(loading)&&
             <LoadingScreen></LoadingScreen>
-    
         }
         {(setupError)&& 
-        /* the variable friendSnapshotError means something is wrong with the path 
-        'Users/user.uid/CurrentConversation/friend'*/
             <div>
                 <ErrorScreen></ErrorScreen>
             </div>
@@ -376,7 +288,17 @@ const Chatroom = ()=>{
                             <MessagesList></MessagesList>
                         </ChatroomContext.Provider>
                     </div>
-                        <div className="formContainer flexCenter">
+                        <div className="formContainer flexCenter flexColumn">
+                            {replying&&<div className="replyingContainer flexSpaceBetween">
+                                <p>
+                                    Replying to {replying.username}
+                                </p>
+                                <div className="pointer" onClick={()=>{
+                                    setReplying(false)
+                                }}>
+                                    <CloseSVG></CloseSVG>
+                                </div>
+                            </div>}
                             <form className="messageForm redBG" onSubmit={async(e)=>{
                                 e.preventDefault()
                                 messageInputRef.current.value = ""

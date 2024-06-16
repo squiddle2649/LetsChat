@@ -53,6 +53,7 @@ export const MessagesList = ()=>{
                     key={messageObject.id}
                     content={messageObject.content}
                     me={messageObject.sender===user.uid}
+                    replying={messageObject.replying}
                 ></Message>
             </MessagesContext.Provider>
         ))}

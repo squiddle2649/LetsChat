@@ -106,3 +106,8 @@ body{
     margin-right:5px;
     padding: 7px 10px;
 }
+.replyingContainer{
+    background-color: rgb(255, 188, 188);
+    width:95%;
+    padding: 0 2.5%
+}

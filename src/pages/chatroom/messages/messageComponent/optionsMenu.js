@@ -1,13 +1,22 @@
-
+import { ChatroomContext } from 'pages/chatroom/chatroom';
 import { MessageContext } from './messageComponent'
 import React, {useState,useEffect,useContext } from 'react';
 import './messageStyling.css'
 
 export const OptionsMenu = (props)=>{
     const messageContext = useContext(MessageContext)
+    const chatroomContext = useContext(ChatroomContext)
+
     const showModal = messageContext.showModal
     const addAReaction = messageContext.addAReaction
     const me = messageContext.me
+    const messageID = messageContext.messageID
+    const content = messageContext.content
+
+    const setReplying = chatroomContext.setReplying
+    const friendName = chatroomContext.friendName
+    const username = chatroomContext.username
+
     const emojis = ["😃","😂","😬","🤨","😎","😱","😭","🙄","🤝",'👍',"✌️","👏"]
 
     const [reactionsToggled, setReactionsToggled] = useState(false)
@@ -30,7 +39,7 @@ export const OptionsMenu = (props)=>{
       }, [reactionsToggled])
 
     
-    const optionClass = 'menuText redBGhover pointer'
+    const optionClass = 'menuText redBGhover pointer small'
       
     return <div className='menuContainer whiteText' style={visibility}>
         <div 
@@ -42,7 +51,7 @@ export const OptionsMenu = (props)=>{
         >Report message</div>
 
         <div id="reactionOption" className={`${optionClass} reactionOption`}>
-            <div id="reactionOption">Add a reaction</div>
+            <div id="reactionOption" >Add a reaction</div>
             <div style={emojisVisibility} className='emojisContainer'>
                 <button className='removeReactionBtn redBGhover'
                         onClick={()=>{
@@ -61,6 +70,14 @@ export const OptionsMenu = (props)=>{
                 </div>
             </div>
         </div>
+        <div
+            className={optionClass}
+            onClick={()=>{setReplying({
+                id:messageID,
+                content:content,
+                senderName:me?username:friendName,
+            })}}
+        >Reply</div>
 
     </div>
 

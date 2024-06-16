@@ -25,7 +25,7 @@
     width: max-content;
     top: 0;
     left: 100%;
-    padding: 5px;
+
     border-radius: 5px;
     z-index: 2;
 }
@@ -135,4 +135,25 @@
     cursor: pointer;
     font-size: 15px;
     transition-duration: 0ms;
+}
+
+.line{
+    height: 20px;
+    width: 80px;
+    border-radius: 10px;
+    border: 2px solid rgb(106, 106, 106);
+    border-bottom: none;
+    border-right: none;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    margin-left: 35px;
+    margin-top:15px;
+    position:relative
+}
+.replyInfo{
+    position: absolute;
+    left: 85px;
+    top: -50%;
+    display: flex;
+    width: max-content;
 }

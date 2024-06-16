@@ -1,4 +1,7 @@
-
+.startPageContainer{
+    height:100%
+}
+ 
 .nameInput{
     margin-right: 10px;
     margin-left: 10px;
