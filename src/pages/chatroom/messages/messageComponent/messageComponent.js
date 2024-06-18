@@ -24,6 +24,7 @@ export const Message = (props)=>{
     const messageElement = useRef(null)
     const messageID = props.messageID
     const me = props.me
+    const username = props.username
 
     const showMenu = selectedMessage===messageID
 
@@ -119,6 +120,11 @@ export const Message = (props)=>{
         }
     },[])
 
+    const printUsername = ()=>{
+        console.log(`replying-sender: ${props.replying.senderName}`)
+        console.log(`username: ${props.username}`)
+    }
+
     const fileReport = async()=>{
         const reportID = generateRandomKey(20)
         const reportRef = ref(database,`Reports/${reportID}`)
@@ -175,13 +181,17 @@ export const Message = (props)=>{
                     if(showMenu)return
                     setHoveringMessage(false)
                 }}   
+                onClick={()=>{
+                    printUsername()
+                }}
             >
 
                 <div className="flexColumn" style={{width:"100%"}}>
                     {props.replying&&<div className='line'>
                         <div className='replyInfo'>
                             <div style={{
-                                    color: props.replying.senderName===props.username?"#277ab9":"#cd4e67",
+                                    // color: props.replying.senderName===props.username?"#277ab9":"#cd4e67",
+                                    color: props.replying.senderID===user.uid?"#277ab9":"#cd4e67",
                                     marginRight:"10px"
                                 }}>
                                 <strong>{props.replying.senderName}</strong>
@@ -239,9 +249,9 @@ export const Message = (props)=>{
                         <div>
                             <h1>Report Message</h1>
                             <div className='badMessageDisplay flexColumn'>
-                                <p style={usernameStyle}>
+                                <h3 style={{...usernameStyle,...{marginLeft:"0"}}}>
                                     {props.username}
-                                </p>
+                                </h3>
                                 <h3 className="messageText blackText" style={{margin:"0"}}>{props.content}</h3>
                             </div>
                             <div>

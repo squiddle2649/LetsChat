@@ -139,7 +139,7 @@
 
 .line{
     height: 20px;
-    width: 80px;
+    width: 65px;
     border-radius: 10px;
     border: 2px solid rgb(106, 106, 106);
     border-bottom: none;
@@ -152,7 +152,7 @@
 }
 .replyInfo{
     position: absolute;
-    left: 85px;
+    left: 70px;
     top: -50%;
     display: flex;
     width: max-content;

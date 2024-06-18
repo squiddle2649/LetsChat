@@ -291,7 +291,7 @@ const Chatroom = ()=>{
                         <div className="formContainer flexCenter flexColumn">
                             {replying&&<div className="replyingContainer flexSpaceBetween">
                                 <p>
-                                    Replying to {replying.username}
+                                    Replying to {replying.senderName}
                                 </p>
                                 <div className="pointer" onClick={()=>{
                                     setReplying(false)

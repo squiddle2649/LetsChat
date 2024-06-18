@@ -16,6 +16,8 @@ export const OptionsMenu = (props)=>{
     const setReplying = chatroomContext.setReplying
     const friendName = chatroomContext.friendName
     const username = chatroomContext.username
+    const user = chatroomContext.user
+    const friendID = chatroomContext.friendID
 
     const emojis = ["😃","😂","😬","🤨","😎","😱","😭","🙄","🤝",'👍',"✌️","👏"]
 
@@ -76,6 +78,7 @@ export const OptionsMenu = (props)=>{
                 id:messageID,
                 content:content,
                 senderName:me?username:friendName,
+                senderID:me?user.uid:friendID
             })}}
         >Reply</div>
 

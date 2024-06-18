@@ -61,7 +61,7 @@ const StartPage = () =>{
     {/* If info is still loading, show loading screen */}
     {/* If not loading, then show normal start page */}
 
-    return <div className='flexCenter startPageContainer arial'>
+    return <div className='flexCenter startPageContainer nunito-sans-regular'>
         {(loadingUserDocument||loadingUser)?
             /* If info is still loading, show loading screen */
             <LoadingScreen></LoadingScreen>
@@ -72,7 +72,7 @@ const StartPage = () =>{
             signIn()
         }}>
             <div className='formComponents'>
-                <label><h1 className='arial-bold'>👋 Hi, my name is </h1></label>
+                <label><h1 >👋 Hi, my name is </h1></label>
                 <input className='nameInput' required type="text"  onChange={(e)=>{
                     setUsername(e.target.value)
                 }}></input>
